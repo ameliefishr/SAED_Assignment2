@@ -30,63 +30,41 @@ public class App extends Application
         launch();
     }
 
-    @Override
+   @Override
     public void start(Stage stage)
     {
-        // Set up the main "top-down" display area. This is an example only, and you should
-        // change this to set it up as you require.
-
         GridArea area = new GridArea(10, 10);
-        // area.setGridLines(false); // If desired
         area.setStyle("-fx-background-color: #006000;");
+        
+        // load game configuration from input file
+        loadGameConfiguration("input_generator/bin/generate.bat", area); // input generator
+        
+        // player controls
+        var upBtn = new Button("Up");
+        var downBtn = new Button("Down");
+        var leftBtn = new Button("Left");
+        var rightBtn = new Button("Right");
 
-        area.getIcons().add(new GridAreaIcon(
-            1,   // x
-            1,   // y
-            0.0, // rotation (degrees)
-            1.0, // scale
-            App.class.getClassLoader().getResourceAsStream("airport.png"),  // Image (InputStream)
-            "Airport 1"));  // caption
-
-        area.getIcons().add(new GridAreaIcon(
-            5, 3, 45.0, 1.0,
-            App.class.getClassLoader().getResourceAsStream("plane.png"),
-            "Plane 1"));
-
-
-        // Set up other key parts of the user interface. You'll also want to adjust this.
-
-        var startBtn = new Button("Start");
-        var endBtn = new Button("End");
-
-        startBtn.setOnAction((event) ->
-        {
-            System.out.println("Start button pressed");
-        });
-        endBtn.setOnAction((event) ->
-        {
-            System.out.println("End button pressed");
-        });
-        stage.setOnCloseRequest((event) ->
-        {
-            System.out.println("Close button pressed");
-        });
-        var statusText = new Label("Label Text");
+        var statusText = new Label("Welcome to the Puzzle Game!");
+        
+        // text area for player moves/inventory, will probably switch to popups later
         var textArea = new TextArea();
-        textArea.appendText("Sidebar\n");
-        textArea.appendText("Text\n");
+        textArea.setEditable(false);
 
-
-        // Below is basically just the GUI "plumbing" (connecting things together).
-
+        // - player movement, coded in buttons for now but will switch to keyboard input later
+        upBtn.setOnAction((event) -> movePlayer("up", area, statusText, textArea));
+        downBtn.setOnAction((event) -> movePlayer("down", area, statusText, textArea));
+        leftBtn.setOnAction((event) -> movePlayer("left", area, statusText, textArea));
+        rightBtn.setOnAction((event) -> movePlayer("right", area, statusText, textArea));
+        
         var toolbar = new ToolBar();
-        toolbar.getItems().addAll(startBtn, endBtn, new Separator(), statusText);
+        toolbar.getItems().addAll(upBtn, downBtn, leftBtn, rightBtn, new Separator(), statusText);
 
         var splitPane = new SplitPane();
         splitPane.getItems().addAll(area, textArea);
         splitPane.setDividerPositions(0.75);
 
-        stage.setTitle("Air Traffic Simulator");
+        stage.setTitle("Puzzle Game");
         var contentPane = new BorderPane();
         contentPane.setTop(toolbar);
         contentPane.setCenter(splitPane);
@@ -95,4 +73,13 @@ public class App extends Application
         stage.setScene(scene);
         stage.show();
     }
+
+    private void loadGameConfiguration(String filePath, GridArea area) {
+        // TODO: logic to read from input generator and initialize grid area based off it's data
+    }
+
+    private void movePlayer(String direction, GridArea area, Label statusText, TextArea textArea) {
+        // TODO: code to handle player movement, update grid visibility, and check for items or obstacles
+    }
+
 }
