@@ -7,13 +7,17 @@ import java.util.*;
 import java.io.*; 
 import java.io.FileNotFoundException; 
 
-ublic class MyParser {
-    private static int rows; // for size rows
-    private static int cols; // for size columns
-    private static int startRow; // for start row
-    private static int startCol; // for start column
-    private static int goalRow; // for goal row
-    private static int goalCol; // for goal column
+public class MyParser {
+    // Class-level variables to store parsed data
+    private static int rows;
+    private static int cols;
+    private static int startRow;
+    private static int startCol;
+    private static int goalRow;
+    private static int goalCol;
+    private static String name;
+    private static List<String> coordinates = new ArrayList<>();
+    private static String message;
     private static Game game; // game instance
 
     public static void main(String[] args) throws ParseException, FileNotFoundException {
@@ -23,10 +27,14 @@ ublic class MyParser {
         
         initializeGame();
         
+
         System.out.println("Parsed Game Variables:");
         System.out.println("Size: " + rows + " x " + cols);
         System.out.println("Start: (" + startRow + "," + startCol + ")");
         System.out.println("Goal: (" + goalRow + "," + goalCol + ")");
+        System.out.println("Parsed Item: " + name);
+        System.out.println("Coordinates: " + coordinates);
+        System.out.println("Message: " + message);
     }
 
     private static void initializeGame() {
@@ -52,10 +60,16 @@ TOKEN : {
     <SIZE: "size"> |
     <START: "start"> |
     <GOAL: "goal"> |
+    <ITEM: "item"> |
+    <AT: "at"> |
+    <MESSAGE: "message"> |
     <LPAREN: "("> |
     <RPAREN: ")"> |
+    <LBRACE: "{"> |
+    <RBRACE: "}"> |
     <COMMA: ","> |
-    <NUMBER: (["0"-"9"])+> // Tokens for numbers
+    <STRING_LITERAL: "\"" (~["\""])* "\"" > |
+    <NUMBER: (["0"-"9"])+> 
 }
 
 // Parser definitions
@@ -66,6 +80,7 @@ void StartupDeclarations() :
     SizeDeclaration() 
     StartDeclaration() 
     GoalDeclaration()
+    ItemDeclaration()
 }
 
 // Parse size declaration: size (rows, cols)
@@ -116,5 +131,60 @@ void GoalDeclaration() :
         if (goalRow < 0 || goalRow >= rows || goalCol < 0 || goalCol >= cols) {
             throw new ParseException("Invalid goal location. Must be within grid bounds.");
         }
+    }
+}
+
+// Parse item declaration: item "name" { at (1,1), message "text" }
+void ItemDeclaration() : 
+{
+    Token nameToken; 
+    List<String> locList = new ArrayList<>();
+} 
+{
+    <ITEM> nameToken = <STRING_LITERAL> <LBRACE> AtDeclaration(locList) MessageDeclaration() <RBRACE>
+    {
+        name = nameToken.image.substring(1, nameToken.image.length() - 1); 
+        coordinates = locList; 
+    }
+}
+
+// list of coordinates
+void AtDeclaration(List<String> locList) : 
+{
+} 
+{
+    <AT> CoordinateList(locList)
+}
+
+// parse list of coordinates (allow multiple pairs)
+void CoordinateList(List<String> locList) : 
+{
+} 
+{
+    Coordinate(locList) ( <COMMA> Coordinate(locList) )*
+}
+
+// parse individual coordinates 
+void Coordinate(List<String> locList) : 
+{
+    Token x; 
+    Token y;
+} 
+{
+    <LPAREN> x = <NUMBER> <COMMA> y = <NUMBER> <RPAREN>
+    {
+        locList.add("(" + x.image + "," + y.image + ")"); 
+    }
+}
+
+// handle message declaration
+void MessageDeclaration() : 
+{
+    Token messageToken;
+} 
+{
+    <MESSAGE> messageToken = <STRING_LITERAL> 
+    {
+        message = messageToken.image.substring(1, messageToken.image.length() - 1); 
     }
 }
