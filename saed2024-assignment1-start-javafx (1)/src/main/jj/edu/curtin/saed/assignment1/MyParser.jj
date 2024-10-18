@@ -2,60 +2,51 @@ PARSER_BEGIN(MyParser)
 
 package edu.curtin.saed.assignment1;
 
-import edu.curtin.saed.assignment1.*;
-import java.util.*;
+import edu.curtin.saed.assignment1.MyParserTokenManager;
+import edu.curtin.saed.assignment1.Token;
+import edu.curtin.saed.assignment1.SimpleCharStream;
+import edu.curtin.saed.assignment1.ParseException;
+
+import java.util.*; 
 import java.io.*; 
 import java.io.FileNotFoundException; 
 
 public class MyParser {
-    // Class-level variables to store parsed data
-    private static int rows;
-    private static int cols;
-    private static int startRow;
-    private static int startCol;
-    private static int goalRow;
-    private static int goalCol;
-    private static String name;
-    private static List<String> coordinates = new ArrayList<>();
-    private static String message;
-    private static Game game; // game instance
+    public static int rows;
+    public static int cols;
+    public static int startRow;
+    public static int startCol;
+    public static int goalRow;
+    public static int goalCol;
+    public static String name;
+    public static List<String> coordinates = new ArrayList<>();
+    public static String message;
+    public static Game game; // game instance
 
-    public static void main(String[] args) throws ParseException, FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream("input.dsl");
-        MyParser parser = new MyParser(fileInputStream);
-        parser.StartupDeclarations();
-        
+    public static void parseFile(InputStream inputStream) throws ParseException, FileNotFoundException {
+        MyParser parser = new MyParser(inputStream);
+        MyParser.StartupDeclarations(); 
         initializeGame();
-        
-
-        System.out.println("Parsed Game Variables:");
-        System.out.println("Size: " + rows + " x " + cols);
-        System.out.println("Start: (" + startRow + "," + startCol + ")");
-        System.out.println("Goal: (" + goalRow + "," + goalCol + ")");
-        System.out.println("Parsed Item: " + name);
-        System.out.println("Coordinates: " + coordinates);
-        System.out.println("Message: " + message);
     }
+
 
     private static void initializeGame() {
         Location playerLocation = new Location(startRow, startCol); 
         Location goalLocation = new Location(goalRow, goalCol);
-
         game = new Game(playerLocation, goalLocation, new ArrayList<>(), new ArrayList<>());
-        
+
         System.out.println("Game Initialized:");
-        System.out.println("Player Start Location: " + playerLocation);
-        System.out.println("Goal Location: " + goalLocation);
+        System.out.println("Player Start Location: " + playerLocation.toString());
+        System.out.println("Goal Location: " + goalLocation.toString());
     }
 }
 
 PARSER_END(MyParser)
 
 SKIP : {
-    " " | "\t" | "\r" | "\n" // Skip spaces, tabs, and newlines
+    " " | "\t" | "\r" | "\n" 
 }
 
-// Token definitions
 TOKEN : {
     <SIZE: "size"> |
     <START: "start"> |
@@ -72,7 +63,6 @@ TOKEN : {
     <NUMBER: (["0"-"9"])+> 
 }
 
-// Parser definitions
 void StartupDeclarations() : 
 { 
 } 
@@ -83,7 +73,6 @@ void StartupDeclarations() :
     ItemDeclaration()
 }
 
-// Parse size declaration: size (rows, cols)
 void SizeDeclaration() : 
 {
     Token rowToken;
@@ -100,7 +89,6 @@ void SizeDeclaration() :
     }
 }
 
-// Parse start declaration: start (startRow, startCol)
 void StartDeclaration() : 
 {
     Token startRowToken;
@@ -117,7 +105,6 @@ void StartDeclaration() :
     }
 }
 
-// Parse goal declaration: goal (goalRow, goalCol)
 void GoalDeclaration() : 
 {
     Token goalRowToken;
@@ -134,7 +121,6 @@ void GoalDeclaration() :
     }
 }
 
-// Parse item declaration: item "name" { at (1,1), message "text" }
 void ItemDeclaration() : 
 {
     Token nameToken; 

@@ -12,7 +12,7 @@ public class Game {
     private List<Obstacle> obstacles; 
     private List<Script> scripts; 
 
-    // Constructor
+    // constructor
     public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList) {
         this.gridWidth = 10; 
         this.gridHeight = 10; 
@@ -88,5 +88,18 @@ public class Game {
 
     public void addPlugin(Plugin plugin) {
         // TODO: implement  
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game State:\n");
+        sb.append("Grid Size: ").append(gridWidth).append(" x ").append(gridHeight).append("\n");
+        sb.append("Player Start Location: ").append(playerStartLocation).append("\n");
+        sb.append("Goal Location: ").append(goalLocation).append("\n");
+        sb.append("Items: ").append(items.size()).append(" item(s)\n");
+        sb.append("Obstacles: ").append(obstacles.size()).append(" obstacle(s)\n");
+        sb.append("Scripts: ").append(scripts.size()).append(" script(s)\n");
+        return sb.toString();
     }
 }

@@ -3,6 +3,7 @@ plugins {
     id "application"
     id "pmd"
     id "org.openjfx.javafxplugin" version "0.1.0"
+    id "org.javacc.javacc" version "3.0.2" 
 }
 
 repositories {
@@ -15,7 +16,7 @@ application {
 
 javafx {
     version = '21'
-    modules = [ 'javafx.controls' ]
+    modules = ['javafx.controls']
 }
 
 pmd {
@@ -29,7 +30,7 @@ pmd {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', 'src/main/jj']
+            srcDirs = ['src/main/java', 'src/main/jj'] 
         }
     }
 }
@@ -38,10 +39,20 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:all,-serial"
 }
 
+compileJavacc {
+    inputDirectory = file('src/main/jj') 
+    outputDirectory = file("${project.buildDir}/generated/javacc") 
+}
+
+compileJava {
+    dependsOn compileJavacc
+}
+
+sourceSets.main.java.srcDir("${project.buildDir}/generated/javacc")
+
 tasks.named("run") {
     environment["PATH"] = (
         layout.projectDirectory.dir("comms").dir("bin").toString() 
         + File.pathSeparator
         + System.getenv("PATH"))
 }
-

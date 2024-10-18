@@ -33,32 +33,16 @@ public class App extends Application {
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            fileName = args[0]; 
+            //fileName = args[0]; 
         }
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-        // Set up the main "top-down" display area. This is an example only, and you should
-        // change this to set it up as you require.
-
+        // Set up the main "top-down" display area.
         GridArea area = new GridArea(10, 10);
         area.setStyle("-fx-background-color: #006000;");
-
-        // Sample icons
-        area.getIcons().add(new GridAreaIcon(
-                1,   
-                1,   
-                0.0, // rotation (degrees)
-                1.0, // scale
-                App.class.getClassLoader().getResourceAsStream("airport.png"),  // Image (InputStream)
-                "Airport 1"));  // caption
-
-        area.getIcons().add(new GridAreaIcon(
-                5, 3, 45.0, 1.0,
-                App.class.getClassLoader().getResourceAsStream("plane.png"),
-                "Plane 1"));
 
         var startBtn = new Button("Start");
         var endBtn = new Button("End");
@@ -79,8 +63,6 @@ public class App extends Application {
         });
         var statusText = new Label("Label Text");
         textArea = new TextArea(); 
-        textArea.appendText("Sidebar\n");
-        textArea.appendText("Text\n");
 
         // Below is basically just the GUI "plumbing" (connecting things together).
         var toolbar = new ToolBar();
@@ -101,22 +83,11 @@ public class App extends Application {
     }
 
     private void parseConfigurationFile() {
-        if (fileName == null || fileName.isEmpty()) {
-            textArea.appendText("No file name provided via command line.\n");
-            return;
-        }
-
-        File file = new File(fileName);
-        if (!file.exists()) {
-            textArea.appendText("File not found: " + fileName + "\n");
-            return;
-        }
-
-        try (InputStream inputStream = new FileInputStream(file)) {
-            System.out.println("Using file: " + file.getAbsolutePath());
-            // MyParser parser = new MyParser(inputStream); 
-            Game game = new Game(null, null, null, null); // Initialize Game as needed
-            // parser.start(game);
+        try (InputStream inputStream = new FileInputStream("input.dsl")) {
+            //System.out.println("Using file: " + file.getAbsolutePath());
+            MyParser.parseFile(inputStream); 
+            Game game = MyParser.game; 
+            System.out.println(game.toString());
             textArea.appendText("Parsed Configuration:\n" + game.toString() + "\n");
         } catch (IOException e) {
             textArea.appendText("Error reading file: " + e.getMessage() + "\n");
