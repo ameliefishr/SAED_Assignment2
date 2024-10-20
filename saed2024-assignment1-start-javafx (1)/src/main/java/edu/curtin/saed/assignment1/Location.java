@@ -35,7 +35,8 @@ public class Location
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "(" + xPos + ", " + yPos + ")";
     }
 }

@@ -11,6 +11,7 @@ public class Game {
     private List<Item> items; 
     private List<Obstacle> obstacles; 
     private List<Script> scripts; 
+    private List<Plugin> plugins;
 
     // constructor
     public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList) {
@@ -21,85 +22,116 @@ public class Game {
         this.items = (itemList != null) ? itemList : new ArrayList<>(); 
         this.obstacles = (obstacleList != null) ? obstacleList : new ArrayList<>(); 
         this.scripts = new ArrayList<>(); 
+        this.plugins = new ArrayList<>();
     }
 
     // getters
-    public int getGridWidth() { 
+    public int getGridWidth()
+    { 
         return this.gridWidth; 
     }
 
-    public List<Obstacle> getObstacles() {
+    public List<Obstacle> getObstacles()
+    {
         return this.obstacles;
     }
 
-    public int getGridHeight() {
+    public int getGridHeight()
+    {
         return this.gridHeight;
     }
 
-    public Location getPlayerStartLocation() {
+    public Location getPlayerStartLocation()
+    {
         return this.playerStartLocation;
     }
 
-    public Location getGoalLocation() {
+    public Location getGoalLocation()
+    {
         return this.goalLocation;
     }
 
-    public List<Item> getItems() {
+    public List<Item> getItems()
+    {
         return this.items;
     }
 
-    public List<Script> getScripts() {
+    public List<Script> getScripts()
+    {
         return this.scripts;
     }
 
     // setters
-    public void setPlayerStartLocation(Location playerLocation) {
+    public void setPlayerStartLocation(Location playerLocation)
+    {
         this.playerStartLocation = playerLocation;
     }
 
-    public void setGoalLocation(Location goalLocation) {
+    public void setGoalLocation(Location goalLocation)
+    {
         this.goalLocation = goalLocation;
     }
 
-    public void setGridWidth(int gridWidth) {
+    public void setGridWidth(int gridWidth)
+    {
         this.gridWidth = gridWidth;
     }
 
-    public void setGridHeight(int gridHeight) {
+    public void setGridHeight(int gridHeight)
+    {
         this.gridHeight = gridHeight;
     }
 
-    public void setGridSize(int width, int height) {
+    public void setGridSize(int width, int height)
+    {
         setGridWidth(width);
         setGridHeight(height);
     }
 
-    public void addItem(Item item) {
+    public void addItem(Item item)
+    {
         this.items.add(item); 
     }
     
-    public void addObstacle(Obstacle obstacle) {
+    public void addObstacle(Obstacle obstacle)
+    {
         this.obstacles.add(obstacle); 
     }
 
-    public void addScript(Script script) {
+    public void addScript(Script script)
+    {
         this.scripts.add(script); 
     }
 
-    public void addPlugin(Plugin plugin) {
-        // TODO: implement  
+    public void addPlugin(Plugin plugin)
+    {
+        this.plugins.add(plugin); 
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("Game State:\n");
         sb.append("Grid Size: ").append(gridWidth).append(" x ").append(gridHeight).append("\n");
         sb.append("Player Start Location: ").append(playerStartLocation).append("\n");
         sb.append("Goal Location: ").append(goalLocation).append("\n");
-        sb.append("Items: ").append(items.size()).append(" item(s)\n");
-        sb.append("Obstacles: ").append(obstacles.size()).append(" obstacle(s)\n");
-        sb.append("Scripts: ").append(scripts.size()).append(" script(s)\n");
+        sb.append("Items:\n");
+        for (Item item : items) {
+            sb.append(item.toString()).append("\n");
+        }
+        sb.append("Obstacles:\n");
+        for (Obstacle obstacle : obstacles) {
+            sb.append(obstacle.toString()).append("\n");
+        }
+        sb.append("Plugins:\n");
+        for (Plugin plugin : plugins) {
+            sb.append(plugin.toString()).append("\n");
+        }
+        sb.append("Scripts:\n");
+        for (Script script : scripts) {
+            sb.append(script.toString()).append("\n");
+        }
         return sb.toString();
     }
 }

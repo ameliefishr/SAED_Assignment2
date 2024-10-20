@@ -53,4 +53,10 @@ public class Item
     }
     
     // TO DO: logic to find and remove location
+
+    @Override
+    public String toString()
+    {
+        return "Item [name=" + name + ", locations=" + locations + ", message=" + message + "]";
+    }
 }

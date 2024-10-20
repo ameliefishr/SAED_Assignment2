@@ -7,6 +7,18 @@ item "Wooden Sword" {
     message "Use wisely."
 }
 
+
+item "Meow" {
+    at (0,1), (1,5), (3,1)
+    message "meow meow meow meow."
+}
+
+
+item "Woof" {
+    at (0,1), (1,5), (3,1)
+    message "woof woof woof woof."
+}
+
 obstacle {
     at (1,1)
     requires "Wooden Sword"
