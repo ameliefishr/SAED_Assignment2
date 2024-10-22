@@ -7,16 +7,9 @@ item "Wooden Sword" {
     message "Use wisely."
 }
 
-
-item "Meow" {
-    at (0,1), (1,5), (3,1)
-    message "meow meow meow meow."
-}
-
-
-item "Woof" {
-    at (0,1), (1,5), (3,1)
-    message "woof woof woof woof."
+item "Rock" {
+    at (1,3), (2,7)
+    message "A cool rock."
 }
 
 obstacle {

@@ -22,21 +22,20 @@ public class MyParser implements MyParserConstants {
     public static String message;
     public static Game game; // game instance
 
-    // Define lists for obstacles, plugins, and scripts
     private static List<Item> items = new ArrayList<>();
     private static List<Obstacle> obstacles = new ArrayList<>();
     private static List<String> plugins = new ArrayList<>();
     private static List<String> scripts = new ArrayList<>();
 
     public static void parseFile(FileReader fileReader) throws ParseException, FileNotFoundException {
-        // Use the parser instance to read the file input
+
         MyParser parser = new MyParser(fileReader);
 
-        // Start parsing the declarations in the file
-        parser.StartupDeclarations();
+        MyParser.StartupDeclarations();
+        game.setGridWidth(rows);
+        game.setGridHeight(cols);
 
-
-        // Output the parsed values (assuming you have variables to store these values)
+        // printing for parser debugging <- REMOVE FOR FINAL SUBMISSION
         System.out.println("Parsed Game Variables:");
         System.out.println("Size: " + rows + " x " + cols);
         System.out.println("Start: (" + startRow + "," + startCol + ")");
@@ -53,6 +52,8 @@ public class MyParser implements MyParserConstants {
     private static void initializeGame() {
         Location playerLocation = new Location(startRow, startCol);
         Location goalLocation = new Location(goalRow, goalCol);
+
+        // items, obstacles etc. are empty to start with, only startup variables are initialized
         game = new Game(playerLocation, goalLocation, new ArrayList<>(), new ArrayList<>());
 
         System.out.println("Game Initialized:");
@@ -65,6 +66,11 @@ public class MyParser implements MyParserConstants {
         int x = Integer.parseInt(parts[0].trim());
         int y = Integer.parseInt(parts[1].trim());
         return new int[]{x, y};
+    }
+
+// only call AFTER ininitalizeGame or game will be null
+    public static Game getGameInstance() {
+        return game;
     }
 
   static final public void StartupDeclarations() throws ParseException {
@@ -121,6 +127,7 @@ initializeGame();
     jj_consume_token(RPAREN);
 rows = Integer.parseInt(rowToken.image);
         cols = Integer.parseInt(colToken.image);
+
         if (rows < 1 || cols < 1) {
             {if (true) throw new ParseException("Invalid size values. Must be at least 1.");}
         }
@@ -180,12 +187,9 @@ name = nameToken.image.substring(1, nameToken.image.length() - 1);
     AtDeclaration(locList);
     RequiresDeclaration(requiredItems);
     jj_consume_token(RBRACE);
-// Directly use the Location object from locList
-        Location obstacleLocation = locList.get(0);
+Location obstacleLocation = locList.get(0);
         List<Location> obstacleLocations = new ArrayList<>();
         obstacleLocations.add(obstacleLocation);
-
-        // Assuming Obstacle requires a string parameter (update as per your class definition)
         Obstacle obstacle = new Obstacle(obstacleLocations, requiredItems);
         obstacles.add(obstacle);
         game.addObstacle(obstacle);
@@ -240,8 +244,7 @@ plugins.add("Plugin: " + qualifiedName.toString());
     jj_consume_token(RPAREN);
     jj_consume_token(COLON);
     MethodDeclaration();
-// Store the class declaration
-        scripts.add("Class: " + className.image);
+scripts.add("Class: " + className.image);
 }
 
   static final public void QualifiedNameScript() throws ParseException {Token part;
@@ -260,8 +263,7 @@ plugins.add("Plugin: " + qualifiedName.toString());
       jj_consume_token(DOT);
       part = jj_consume_token(IDENTIFIER);
     }
-scripts.add("Superclass: " + part.image);  // Record fully qualified name
-
+scripts.add("Superclass: " + part.image);
 }
 
   static final public void MethodDeclaration() throws ParseException {Token methodName;
@@ -282,8 +284,7 @@ scripts.add("Method: " + methodName.image);
     jj_consume_token(COMMA);
     y = jj_consume_token(NUMBER);
     jj_consume_token(RPAREN);
-// Add a new Location object with parsed coordinates to locList
-        locList.add(new Location(Integer.parseInt(x.image), Integer.parseInt(y.image)));
+locList.add(new Location(Integer.parseInt(x.image), Integer.parseInt(y.image)));
 }
 
   static final public void AtDeclaration(List<Location> locList) throws ParseException {
@@ -324,13 +325,11 @@ message = msgToken.image.substring(1, msgToken.image.length() - 1);
     jj_consume_token(LPAREN);
     jj_consume_token(RPAREN);
     jj_consume_token(RPAREN);
-// Add the statement to the script block
-        scripts.add("Statement: print(api.getSomeInfo())");
+scripts.add("Statement: print(api.getSomeInfo())");
 }
 
   static final public void RequiresDeclaration(List<Item> requiredItems) throws ParseException {Token itemToken;
-    List<String> tempItems = new ArrayList<>(); // Use String to store item names temporarily
-
+    List<String> tempItems = new ArrayList<>();
     jj_consume_token(REQUIRES);
     itemToken = jj_consume_token(STRING_LITERAL);
     label_5:
@@ -347,13 +346,11 @@ message = msgToken.image.substring(1, msgToken.image.length() - 1);
       jj_consume_token(COMMA);
       itemToken = jj_consume_token(STRING_LITERAL);
     }
-// Add the parsed item names to the temporary list
-        tempItems.add(itemToken.image);
+tempItems.add(itemToken.image);
 
         for (String item : tempItems) {
-            // Parse the item name from the token, then create an Item object
-            String itemName = item.substring(1, item.length() - 1); // Remove quotes
-            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "Some String")); // Adjust as necessary
+            String itemName = item.substring(1, item.length() - 1); // 1, -1 to remove the "" quotes
+            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "Some String"));
         }
 }
 

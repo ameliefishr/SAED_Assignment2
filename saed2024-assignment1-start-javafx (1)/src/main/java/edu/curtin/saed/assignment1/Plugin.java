@@ -1,6 +1,7 @@
 package edu.curtin.saed.assignment1;
 
-public class Plugin {
+public class Plugin
+{
     private String name;
 
     public Plugin(String name)
@@ -9,10 +10,15 @@ public class Plugin {
     }
 
     // getters
-
     public String getName()
     {
         return name;
+    }
+
+    // setters
+    public void setName(String pluginName)
+    {
+        this.name = pluginName;
     }
 
     @Override

@@ -5,7 +5,7 @@ import java.util.List;
 public class Item
 {
     private String name;
-    private List<Location> locations; 
+    private List<Location> locations;
     private String message;
 
     public Item(String name, List<Location> locations, String message)
@@ -18,7 +18,7 @@ public class Item
     // getters
     public String getName()
     {
-        return name; 
+        return name;
     }
 
     public List<Location> getLocations()
@@ -51,8 +51,12 @@ public class Item
     {
         this.locations.add(item_location);
     }
-    
-    // TO DO: logic to find and remove location
+
+    // remove a specific location from the locaiton list
+    public void removeLocation(Location item_location)
+    {
+        locations.remove(item_location);
+    }
 
     @Override
     public String toString()

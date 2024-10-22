@@ -31,7 +31,9 @@ public class MyParser {
 
         MyParser parser = new MyParser(fileReader);
         
-        parser.StartupDeclarations();  
+        MyParser.StartupDeclarations();  
+        game.setGridWidth(rows);
+        game.setGridHeight(cols);
         
         // printing for parser debugging <- REMOVE FOR FINAL SUBMISSION
         System.out.println("Parsed Game Variables:");
@@ -65,6 +67,11 @@ public class MyParser {
         int y = Integer.parseInt(parts[1].trim()); 
         return new int[]{x, y}; 
     }
+
+// only call AFTER ininitalizeGame or game will be null
+    public static Game getGameInstance() {
+        return game; 
+    }    
 }
 
 PARSER_END(MyParser)
@@ -89,8 +96,8 @@ TOKEN : {
     <DEF: "def"> |
     <HANDLEEVENT: "handleEvent"> |
     <PRINT: "print"> |
-    <IDENTIFIER: (["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* )> | // Identifier token
-    <DOT: "."> | // Dot token
+    <IDENTIFIER: (["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* )> | 
+    <DOT: "."> | 
     <LPAREN: "("> |
     <RPAREN: ")"> |
     <LBRACE: "{"> |
@@ -98,8 +105,8 @@ TOKEN : {
     <COMMA: ","> |
     <STRING_LITERAL: "\"" (~["\""])* "\"" > |
     <NUMBER: (["0"-"9"])+> |
-    <COLON: ":"> | // Define COLON token
-    <EXCLAMATION: "!"> // Define EXCLAMATION token
+    <COLON: ":"> |
+    <EXCLAMATION: "!"> 
 }
 
 void StartupDeclarations() : 
@@ -139,6 +146,7 @@ void SizeDeclaration() :
     {
         rows = Integer.parseInt(rowToken.image);
         cols = Integer.parseInt(colToken.image);
+        
         if (rows < 1 || cols < 1) {
             throw new ParseException("Invalid size values. Must be at least 1.");
         }

@@ -1,6 +1,7 @@
 package edu.curtin.saed.assignment1;
 
-public class Script {
+public class Script
+{
     private String className;
     private String superclassName;
     private String methodName;
@@ -26,6 +27,8 @@ public class Script {
     {
         this.statement = statement;
     }
+
+    // TO DO: getters
 
     @Override
     public String toString()

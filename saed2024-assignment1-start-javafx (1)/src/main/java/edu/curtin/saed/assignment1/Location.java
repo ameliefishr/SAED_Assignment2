@@ -11,17 +11,6 @@ public class Location
         this.xPos = x;
         this.yPos = y;
     }
-    
-    // setters
-    public void setX(int x)
-    {
-        this.xPos = x;
-    }
-
-    public void setY(int y)
-    {
-        this.xPos = y;
-    }
 
     // getters
     public int getX()
@@ -32,6 +21,17 @@ public class Location
     public int getY()
     {
         return yPos;
+    }
+    
+    // setters
+    public void setX(int x)
+    {
+        this.xPos = x;
+    }
+
+    public void setY(int y)
+    {
+        this.xPos = y;
     }
 
     @Override

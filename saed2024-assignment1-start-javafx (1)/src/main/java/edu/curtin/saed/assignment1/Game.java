@@ -12,10 +12,11 @@ public class Game {
     private List<Obstacle> obstacles; 
     private List<Script> scripts; 
     private List<Plugin> plugins;
+    private Player player;
 
     // constructor
     public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList) {
-        this.gridWidth = 10; 
+        this.gridWidth = 10; // default size if none is given
         this.gridHeight = 10; 
         this.playerStartLocation = playerLocation;
         this.goalLocation = goalLocation;
@@ -23,6 +24,7 @@ public class Game {
         this.obstacles = (obstacleList != null) ? obstacleList : new ArrayList<>(); 
         this.scripts = new ArrayList<>(); 
         this.plugins = new ArrayList<>();
+        this.player = new Player(playerLocation);
     }
 
     // getters
@@ -46,6 +48,11 @@ public class Game {
         return this.playerStartLocation;
     }
 
+    public Player getPlayer()
+    {
+        return this.player;
+    }
+
     public Location getGoalLocation()
     {
         return this.goalLocation;
@@ -65,6 +72,11 @@ public class Game {
     public void setPlayerStartLocation(Location playerLocation)
     {
         this.playerStartLocation = playerLocation;
+    }
+
+    public void setPlayerLocation(Location playerLocation)
+    {
+        this.player.setLocation(playerLocation); 
     }
 
     public void setGoalLocation(Location goalLocation)
@@ -93,6 +105,17 @@ public class Game {
         this.items.add(item); 
     }
     
+    public void removeItem(Item item)
+    {
+        this.items.remove(item);
+    }
+
+    public void removeObstacle(Obstacle obstacle)
+    {
+        this.obstacles.remove(obstacle);
+    }
+
+
     public void addObstacle(Obstacle obstacle)
     {
         this.obstacles.add(obstacle); 
