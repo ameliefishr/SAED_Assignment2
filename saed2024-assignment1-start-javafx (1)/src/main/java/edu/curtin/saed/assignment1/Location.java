@@ -39,4 +39,5 @@ public class Location
     {
         return "(" + xPos + ", " + yPos + ")";
     }
+
 }

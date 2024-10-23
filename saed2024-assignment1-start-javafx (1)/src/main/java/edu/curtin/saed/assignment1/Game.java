@@ -3,7 +3,10 @@ package edu.curtin.saed.assignment1;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game {
+import javafx.scene.image.Image;
+
+public class Game
+{
     private int gridWidth;
     private int gridHeight;
     private Location playerStartLocation;
@@ -110,11 +113,24 @@ public class Game {
         this.items.remove(item);
     }
 
+    // remove item's location at that position, if there is only one location left then remove item object
+    // kept re-using this code so made it a method
+    public void removeItemLocation(Item item, Location location)
+    {
+        if(item != null && location != null)
+        {
+            item.removeLocation(location);
+            if(item.getLocations().isEmpty())
+            {
+                removeItem(item);
+            }
+        }
+    }
+
     public void removeObstacle(Obstacle obstacle)
     {
         this.obstacles.remove(obstacle);
     }
-
 
     public void addObstacle(Obstacle obstacle)
     {
@@ -130,6 +146,80 @@ public class Game {
     {
         this.plugins.add(plugin); 
     }
+
+    // manages the player's visibility
+    public void revealArea(Location playerLocation, GridArea area)
+    {
+        int x = playerLocation.getX();
+        int y = playerLocation.getY();
+        
+        // 2d array to store the area of visibility surrounding plater
+        double[][] squaresToReveal = new double[][]
+        {
+            {x, y},         //player icon
+            {x - 1, y},     // left square
+            {x + 1, y},     // right right
+            {x, y - 1},     // up square
+            {x, y + 1},     // down square
+            {x - 1, y - 1}, // top-left square
+            {x + 1, y - 1}, // top-right square
+            {x - 1, y + 1}, // bottom-left square 
+            {x + 1, y + 1}  // bottom-right squ8are
+        };
+
+        // pass on array for processing 
+        proccessAreaArray(squaresToReveal, area);
+    }
+    
+    private void proccessAreaArray(double[][] squaresToReveal, GridArea area)
+    {
+        // iterate over each item in the grid
+        area.getIcons().forEach(icon ->
+        {
+            // get their coordinates
+            double getX = icon.getX();
+            double getY = icon.getY();
+            
+            // bool to check whether icon should be revealed
+            boolean reveal = false;
+            
+            // iterate over reveal array and check whether the current icon's coords match any coords in reveal array
+            for (double[] coords : squaresToReveal)
+            {
+                // if a match is found
+                if (coords[0] == getX && coords[1] == getY)
+                {
+                    reveal = true; // reveal = true for this icon
+                    break;
+                }
+            }
+            
+            // reveal the icon
+            if (reveal)
+            {
+                if (icon.getCaption().isEmpty())
+                {
+                    icon.setShown(false);  // if it's one of the "hidden" icons, you want to do the opposite and make it invis
+                } 
+                else
+                {
+                    icon.setShown(true);   // if it's a normal icon then make it visible
+                }
+            }
+            else // if it's not within players visibility
+            {
+                if (icon.getCaption().isEmpty())
+                {
+                    icon.setShown(true);  // if it's a "hidden" icon then switch it back to being shown
+                }
+                else
+                {
+                    icon.setShown(false);   // hide all other icons
+                }
+            }
+        });
+    }
+    
 
     @Override
     public String toString()

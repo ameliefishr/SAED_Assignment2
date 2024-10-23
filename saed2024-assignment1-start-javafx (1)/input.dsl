@@ -8,7 +8,7 @@ item "Wooden Sword" {
 }
 
 item "Rock" {
-    at (1,3), (2,7)
+    at (1,3), (2,7), (9,8)
     message "A cool rock."
 }
 

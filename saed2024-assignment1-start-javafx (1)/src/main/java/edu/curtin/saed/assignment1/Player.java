@@ -46,11 +46,15 @@ public class Player
 
     public void removeItemFromInventory(String itemName)
     {
-        if (inventory.containsKey(itemName)) {
+        if (inventory.containsKey(itemName))
+        {
             int count = inventory.get(itemName);
-            if (count > 1) {
+            if (count > 1)
+            {
                 inventory.put(itemName, count - 1);
-            } else {
+            }
+            else
+            {
                 inventory.remove(itemName);
             }
         }

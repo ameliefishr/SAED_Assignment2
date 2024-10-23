@@ -67,6 +67,13 @@ public class GridArea extends Pane
         return icons;
     }
 
+    public boolean isOccupied(int x, int y) {
+        return icons.stream()
+            .filter(icon -> !icon.getImage().equals(new Image(App.class.getClassLoader().getResourceAsStream("goal.png")))) // Exclude dark.png icons
+            .anyMatch(icon -> icon.getX() == x && icon.getY() == y);
+    }
+    
+
     /**
      * Sets the colour used to display the caption text for each icon.
      */
@@ -180,4 +187,5 @@ public class GridArea extends Pane
         gfx.setStroke(captionColour);
         gfx.strokeText(icon.getCaption(), x, y + (gridSquareSize / 2.0));
     }
+    
 }
