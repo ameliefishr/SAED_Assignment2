@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.scene.input.KeyEvent;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Date;
@@ -42,15 +43,20 @@ public class App extends Application
     private Date date;
     private Locale locale;
     private int dayCount;
-    private static String fileName;
+    private static String filename;
     private static Player player;
     private static final boolean CHEAT_MODE = false; // manually adjust this value to toggle on/off cheat mode
+    private static final boolean SHOW_CAPTIONS = true; // manually adjust this value to toggle icon captions on/off 
 
     public static void main(String[] args)
     {
-        if (args.length > 0) {
-            // TO DO: get file from cmd line args
-            fileName = args[0]; 
+        if (args.length == 0 || args.length > 1)
+        {
+            System.out.println("Incorrect arguments provided. \nCorrect Usage: ./gradlew run --args filename");
+        }
+        else
+        {
+            filename = args[0];
         }
         launch(args);
     }
@@ -59,7 +65,14 @@ public class App extends Application
     public void start(Stage stage)
     {
         // main display area
-        parseConfigurationFile();
+        if(filename != null)
+        {
+            parseConfigurationFile(filename);
+        }
+        else
+        {
+            return;
+        }
         Game gameInstance = MyParser.getGameInstance();
 
         int gridWidth = gameInstance.getGridWidth();
@@ -81,7 +94,7 @@ public class App extends Application
             "Player"
         );
 
-        playerIcon.setShownCaption(false);
+        playerIcon.setShownCaption(SHOW_CAPTIONS);
         area.getIcons().add(playerIcon);
 
         // adding goal to grid
@@ -93,7 +106,7 @@ public class App extends Application
             "Goal"
         );
 
-        goalIcon.setShownCaption(false);
+        goalIcon.setShownCaption(SHOW_CAPTIONS);
 
         if(!CHEAT_MODE)
         {
@@ -132,7 +145,7 @@ public class App extends Application
                     App.class.getClassLoader().getResourceAsStream(iconPath),
                     item.getName()
                 );
-                itemIcon.setShownCaption(false);
+                itemIcon.setShownCaption(SHOW_CAPTIONS);
                 if(!CHEAT_MODE)
                 {
                     itemIcon.setShown(false);
@@ -173,7 +186,7 @@ public class App extends Application
                     App.class.getClassLoader().getResourceAsStream("obstacle.png"),
                     "Obstacle"
                 );
-                obstacleIcon.setShownCaption(false);
+                obstacleIcon.setShownCaption(SHOW_CAPTIONS);
                 if(!CHEAT_MODE)
                 {
                     obstacleIcon.setShown(false);
@@ -493,27 +506,25 @@ public class App extends Application
     }
     
 
-    // parse configuration file to parser to process 
-    // TO DO: this will need to be called in main when receiving file from cmd line
-    private void parseConfigurationFile()
+    // parse configuration file from cmd line to parser to process 
+    private void parseConfigurationFile(String filename)
     {
-        String pathToFile = "input.dsl"; // hardcoded input file for testing 
+        //String pathToFile = "input.dsl"; // hardcoded input file for testing 
         Charset charset;
 
         // TO DO: encoding
 
-        if (pathToFile.endsWith(".utf8.map"))
-        {
-            charset = Charset.forName("UTF-8");
-        }
-        try (FileReader fileReader = new FileReader(pathToFile))
+        //if (filename.endsWith(".utf8.map"))
+        //{
+        //    charset = Charset.forName("UTF-8");
+        //}
+        try (FileReader fileReader = new FileReader(filename))
         {
             MyParser.parseFile(fileReader); 
             System.out.println("File parsed successfully! :D");
         } 
-        catch (Exception e) // TO DO: more defined error handling this is just a placeholder
+        catch (IOException | ParseException e) 
         {
-            e.printStackTrace();
             System.out.println("Error parsing file: " + e.getMessage());
         }
     }
