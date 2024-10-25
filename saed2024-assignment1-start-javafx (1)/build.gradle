@@ -37,6 +37,8 @@ sourceSets {
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:all,-serial"
+    options.compilerArgs << "-Xlint:all,-serial,-static" // ignoring this warning because I kept getting it from one of my auto-generated jj files 
+    // despite my generated files not being in src, tried to fix it but ended up make it worse so just ignoring it
 }
 
 compileJavacc {
