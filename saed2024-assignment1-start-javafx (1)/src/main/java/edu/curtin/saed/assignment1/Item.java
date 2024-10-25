@@ -32,30 +32,30 @@ public class Item
     }
 
     // setters
-    public void setName(String item_name)
+    public void setName(String itemName)
     {
-        this.name = item_name;
+        this.name = itemName;
     }
 
-    public void setMessage(String item_message)
+    public void setMessage(String itemMessage)
     {
-        this.message = item_message;
+        this.message = itemMessage;
     }
 
-    public void setLocations(List<Location> item_locations)
+    public void setLocations(List<Location> itemLocations)
     {
-        this.locations = item_locations;
+        this.locations = itemLocations;
     }
 
-    public void addLocation(Location item_location)
+    public void addLocation(Location itemLocation)
     {
-        this.locations.add(item_location);
+        this.locations.add(itemLocation);
     }
 
     // remove a specific location from the locaiton list
-    public void removeLocation(Location item_location)
+    public void removeLocation(Location itemLocation)
     {
-        locations.remove(item_location);
+        locations.remove(itemLocation);
     }
 
     @Override

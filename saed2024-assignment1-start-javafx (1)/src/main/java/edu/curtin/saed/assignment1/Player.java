@@ -6,7 +6,7 @@ import java.util.Map;
 public class Player
 {
     private Location location;
-    private Map<String, Integer> inventory = new HashMap<>();
+    private Map<String, Integer> inventory;
 
     // constructor
     public Player(Location location)

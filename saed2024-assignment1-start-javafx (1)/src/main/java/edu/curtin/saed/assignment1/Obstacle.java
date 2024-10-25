@@ -25,14 +25,14 @@ public class Obstacle
     }
 
     // setters
-    public void setRequiredItems(List<Item> required_items)
+    public void setRequiredItems(List<Item> requiredItems)
     {
-        this.itemsRequired = required_items; 
+        this.itemsRequired = requiredItems; 
     }
 
-    public void setLocations(List<Location> obstacle_locations)
+    public void setLocations(List<Location> obstacleLocations)
     {
-        this.locations = obstacle_locations;
+        this.locations = obstacleLocations;
     }
 
     public void addLocation(Location location)

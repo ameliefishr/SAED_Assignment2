@@ -34,23 +34,25 @@ public class App extends Application
     private ResourceBundle bundle;
     private String startupText;
     private String inventoryText;
-    private String obstacleRequired_1;
-    private String obstacleRequired_2;
-    private String obstaclePassed_1;
-    private String obstaclePassed_2;
+    private String obstacleRequired1;
+    private String obstacleRequired2;
+    private String obstaclePassed1;
+    private String obstaclePassed2;
     private String pickedUpString;
     private String dateText;
+    private String congratsText;
+    private String summaryText;
     private Date date;
     private Locale locale;
     private int dayCount;
     private static String filename;
     private static Player player;
     private static final boolean CHEAT_MODE = false; // manually adjust this value to toggle on/off cheat mode
-    private static final boolean SHOW_CAPTIONS = true; // manually adjust this value to toggle icon captions on/off 
+    private static final boolean SHOW_CAPTIONS = false; // manually adjust this value to toggle icon captions on/off 
 
     public static void main(String[] args)
     {
-        if (args.length == 0 || args.length > 1)
+        if (args.length == 0 || args.length > 1) // if invalid number of command line args provided
         {
             System.out.println("Incorrect arguments provided. \nCorrect Usage: ./gradlew run --args filename");
         }
@@ -65,7 +67,7 @@ public class App extends Application
     public void start(Stage stage)
     {
         // main display area
-        if(filename != null)
+        if(filename != null) // double check a file was actually provided before parsing
         {
             parseConfigurationFile(filename);
         }
@@ -154,16 +156,16 @@ public class App extends Application
             }
         }
 
-        for (Item itemToRemove : itemsToRemove)
+        if (itemsToRemove != null)
         {
-            for (Location locationToRemove : locationsToRemove) 
+            for (Item itemToRemove : itemsToRemove)
             {
-                gameInstance.removeItemLocation(itemToRemove, locationToRemove);
+                for (Location locationToRemove : locationsToRemove) 
+                {
+                    gameInstance.removeItemLocation(itemToRemove, locationToRemove);
+                }
             }
         }
-
-        itemsToRemove = null;
-        locationsToRemove = null;
 
         List<Obstacle> obstaclesToRemove = new ArrayList<>();
         // initializing obstacles on the grid
@@ -227,12 +229,14 @@ public class App extends Application
         date = new Date();
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, locale);
         dateText = dateFormat.format(date);
-        obstacleRequired_1 = "You need ";
-        obstacleRequired_2 = " to clear this obstacle. \n";
-        obstaclePassed_1 = "Used ";
-        obstaclePassed_2 = " to clear obstacle. \n";
+        obstacleRequired1 = "You need ";
+        obstacleRequired2 = " to clear this obstacle. \n";
+        obstaclePassed1 = "Used ";
+        obstaclePassed2 = " to clear obstacle. \n";
         inventoryText = "Inventory:\n";
         pickedUpString = "Player picked up:";
+        congratsText = "Congratulations!";
+        summaryText = "You have completed the game.\nTotal days taken:";
         dayCount = 0;
 
         TextField localeInput = new TextField();
@@ -381,7 +385,7 @@ public class App extends Application
                                     });
 
                                     player.removeItemFromInventory(itemName);
-                                    textArea.appendText(obstaclePassed_1 + " " + requiredItem.getName() + " " + obstaclePassed_2);
+                                    textArea.appendText(obstaclePassed1 + " " + requiredItem.getName() + " " + obstaclePassed2);
                                     updateInventoryDisplay(inventoryText);
                                     
                                     break;
@@ -397,7 +401,7 @@ public class App extends Application
                         if (!hasRequiredItem)
                         {
                             // tell user the path is blocked and what they need to clear it
-                            textArea.appendText(obstacleRequired_1 + " " + requiredItems.stream().map(Item::getName).findFirst().get() + " " + obstacleRequired_2);
+                            textArea.appendText(obstacleRequired1 + " " + requiredItems.stream().map(Item::getName).findFirst().get() + " " + obstacleRequired2);
                         }
                         
                         break; // exit loop
@@ -409,7 +413,6 @@ public class App extends Application
             if (obstacleToRemove != null)
             {
                 gameInstance.removeObstacle(obstacleToRemove); // remove it
-                obstacleToRemove = null; // set back to null
             }
             
             // if obstacle is cleared and player can move
@@ -425,14 +428,13 @@ public class App extends Application
             
             // after all player movement is complete, check if they have reached the goal
             if (player.getLocation().getX() == gameInstance.getGoalLocation().getX() && player.getLocation().getY() == gameInstance.getGoalLocation().getY()) {
-                textArea.appendText("Congratulations! You've reached the goal.\n");
-                System.out.println("Player has reached the goal.");
+                playerIcon.setShown(false); //make it look like diglett went through the hole
+                textArea.appendText(congratsText + "\n" + summaryText + " " + dayCount);
                 area.setDisable(true); // disable further actions on the grid
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Game Over");
-                    alert.setHeaderText("Congratulations! :D");
-                    alert.setContentText("You have completed the game.\nTotal days taken: " + dayCount);
+                    alert.setHeaderText(congratsText + " ദ്ദി ˉ͈̀꒳ˉ͈́ )✧");
+                    alert.setContentText(summaryText + " " + dayCount);
                     alert.showAndWait();
                 });
             }
@@ -486,7 +488,7 @@ public class App extends Application
         
 
         stage.setScene(scene);
-        stage.setTitle("Puzzle Game");
+        stage.setTitle("Amelie's Puzzle Game");
         stage.show();
         area.requestFocus();  
     }
@@ -510,7 +512,7 @@ public class App extends Application
     private void parseConfigurationFile(String filename)
     {
         //String pathToFile = "input.dsl"; // hardcoded input file for testing 
-        Charset charset;
+        //Charset charset;
 
         // TO DO: encoding
 
@@ -551,7 +553,7 @@ public class App extends Application
             locale = tempLocale;
             textArea.appendText("Locale changed to: " + locale + "\n");
             bundle = ResourceBundle.getBundle("bundle", locale);
-            loadBundle(locale);
+            loadBundle();
             updateUIComponents();
         }
         else
@@ -561,15 +563,17 @@ public class App extends Application
     }
 
     // loads translated text from resource bundle based off selected locale
-    private void loadBundle(Locale locale)
+    private void loadBundle()
     {
         startupText = bundle.getString("startupText");
-        obstacleRequired_1 = bundle.getString("obstacleRequired_1");
-        obstacleRequired_2 = bundle.getString("obstacleRequired_2");
-        obstaclePassed_1 = bundle.getString("obstaclePassed_1");
-        obstaclePassed_2 = bundle.getString("obstaclePassed_2");
+        obstacleRequired1 = bundle.getString("obstacleRequired1");
+        obstacleRequired2 = bundle.getString("obstacleRequired2");
+        obstaclePassed1 = bundle.getString("obstaclePassed1");
+        obstaclePassed2 = bundle.getString("obstaclePassed2");
         inventoryText = bundle.getString("inventoryText");
         pickedUpString = bundle.getString("pickedUpString");
+        congratsText = bundle.getString("congratsText");
+        summaryText = bundle.getString("summaryText");
     }
 
     // method to update ui componenets after locale changes
