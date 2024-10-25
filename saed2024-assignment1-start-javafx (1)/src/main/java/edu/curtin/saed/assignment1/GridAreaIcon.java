@@ -18,6 +18,7 @@ public class GridAreaIcon
     private Image image;
     private String caption;
     private boolean shown = true;
+    private boolean showCaption = true;
 
     public GridAreaIcon(double x, double y, double rotation, double scale, Image image, String caption)
     {
@@ -69,6 +70,11 @@ public class GridAreaIcon
         return shown;
     }
 
+    public boolean isCaptionShown()
+    {
+        return showCaption;
+    }
+
     public void setPosition(double x, double y)
     {
         this.x = x;
@@ -98,5 +104,10 @@ public class GridAreaIcon
     public void setShown(boolean shown)
     {
         this.shown = shown;
+    }
+
+    public void setShownCaption(boolean shown)
+    {
+        this.showCaption = shown;
     }
 }

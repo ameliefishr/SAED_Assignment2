@@ -182,10 +182,13 @@ public class GridArea extends Pane
         gfx.restore();
 
         // Draw the caption below the image.
-        gfx.setTextAlign(TextAlignment.CENTER);
-        gfx.setTextBaseline(VPos.TOP);
-        gfx.setStroke(captionColour);
-        gfx.strokeText(icon.getCaption(), x, y + (gridSquareSize / 2.0));
+        if(icon.isCaptionShown())
+        {
+            gfx.setTextAlign(TextAlignment.CENTER);
+            gfx.setTextBaseline(VPos.TOP);
+            gfx.setStroke(captionColour);
+            gfx.strokeText(icon.getCaption(), x, y + (gridSquareSize / 2.0));
+        }
     }
     
 }

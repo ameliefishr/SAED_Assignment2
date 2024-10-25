@@ -3,8 +3,6 @@ package edu.curtin.saed.assignment1;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.image.Image;
-
 public class Game
 {
     private int gridWidth;
@@ -18,7 +16,8 @@ public class Game
     private Player player;
 
     // constructor
-    public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList) {
+    public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList)
+    {
         this.gridWidth = 10; // default size if none is given
         this.gridHeight = 10; 
         this.playerStartLocation = playerLocation;
