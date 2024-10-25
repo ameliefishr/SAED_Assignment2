@@ -11,6 +11,7 @@ import java.util.*;
 import java.io.*;
 
 public class MyParser implements MyParserConstants {
+    // class variables 
     public static int rows;
     public static int cols;
     public static int startRow;
@@ -22,11 +23,13 @@ public class MyParser implements MyParserConstants {
     public static String message;
     public static Game game; // game instance
 
+    // lists to store plugins, items, scripts and obstacles
     private static List<Item> items = new ArrayList<>();
     private static List<Obstacle> obstacles = new ArrayList<>();
     private static List<String> plugins = new ArrayList<>();
     private static List<String> scripts = new ArrayList<>();
 
+    // function to parse the input file
     public static void parseFile(FileReader fileReader) throws ParseException, FileNotFoundException {
 
         MyParser parser = new MyParser(fileReader);
@@ -53,14 +56,16 @@ public class MyParser implements MyParserConstants {
         Location playerLocation = new Location(startRow, startCol);
         Location goalLocation = new Location(goalRow, goalCol);
 
-        // items, obstacles etc. are empty to start with, only startup variables are initialized
+        // majority of the variables in game are empty to start, will be populated later on
         game = new Game(playerLocation, goalLocation, new ArrayList<>(), new ArrayList<>());
 
+        // print for debugging <- REMOVE FOR SUBMISSIOn
         System.out.println("Game Initialized:");
         System.out.println("Player Start Location: " + playerLocation.toString());
         System.out.println("Goal Location: " + goalLocation.toString());
     }
 
+    // parses coordinate string into an int array of x and y coords so can be made into location object
     private static int[] parseCoordinates(String coordStr) {
         String[] parts = coordStr.split(",");
         int x = Integer.parseInt(parts[0].trim());
@@ -73,6 +78,7 @@ public class MyParser implements MyParserConstants {
         return game;
     }
 
+// statup declarations, defines the structure & order of which to parse the input file
   static final public void StartupDeclarations() throws ParseException {
     SizeDeclaration();
     StartDeclaration();
@@ -117,6 +123,7 @@ initializeGame();
     }
 }
 
+// game size declaration
   static final public void SizeDeclaration() throws ParseException {Token rowToken;
     Token colToken;
     jj_consume_token(SIZE);
@@ -133,6 +140,7 @@ rows = Integer.parseInt(rowToken.image);
         }
 }
 
+// start location declaration
   static final public void StartDeclaration() throws ParseException {Token startRowToken;
     Token startColToken;
     jj_consume_token(START);
@@ -148,6 +156,7 @@ startRow = Integer.parseInt(startRowToken.image);
         }
 }
 
+// goal location declaration
   static final public void GoalDeclaration() throws ParseException {Token goalRowToken;
     Token goalColToken;
     jj_consume_token(GOAL);
@@ -163,6 +172,7 @@ goalRow = Integer.parseInt(goalRowToken.image);
         }
 }
 
+// item declaration
   static final public void ItemDeclaration() throws ParseException {Token nameToken;
     List<Location> locList = new ArrayList<>();
     jj_consume_token(ITEM);
@@ -180,6 +190,7 @@ name = nameToken.image.substring(1, nameToken.image.length() - 1);
         game.addItem(item);
 }
 
+// obstacle declaration
   static final public void ObstacleDeclaration() throws ParseException {List<Location> locList = new ArrayList<>();
     List<Item> requiredItems = new ArrayList<>();
     jj_consume_token(OBSTACLE);
@@ -195,12 +206,14 @@ Location obstacleLocation = locList.get(0);
         game.addObstacle(obstacle);
 }
 
+// plugin declaration
   static final public void PluginDeclarations() throws ParseException {Token pluginName;
     jj_consume_token(PLUGIN);
     QualifiedName();
 
 }
 
+// used in plugin declaration
   static final public void QualifiedName() throws ParseException {Token part;
     StringBuilder qualifiedName = new StringBuilder();
     part = jj_consume_token(IDENTIFIER);
@@ -223,6 +236,7 @@ qualifiedName.append("." + part.image);
 plugins.add("Plugin: " + qualifiedName.toString());
 }
 
+// script declaration
   static final public void ScriptDeclarations() throws ParseException {Token scriptName;
     jj_consume_token(SCRIPT);
     jj_consume_token(EXCLAMATION);
@@ -232,11 +246,13 @@ plugins.add("Plugin: " + qualifiedName.toString());
 
 }
 
+// script block declaration - used in script declaration
   static final public void ScriptBlock() throws ParseException {
     jj_consume_token(CLASS);
     ClassDeclaration();
 }
 
+// class declaration - used in script declaration
   static final public void ClassDeclaration() throws ParseException {Token className, superClass;
     className = jj_consume_token(IDENTIFIER);
     jj_consume_token(LPAREN);
@@ -247,6 +263,7 @@ plugins.add("Plugin: " + qualifiedName.toString());
 scripts.add("Class: " + className.image);
 }
 
+// qualified name for script declaration (differs to the one for plugin)
   static final public void QualifiedNameScript() throws ParseException {Token part;
     part = jj_consume_token(IDENTIFIER);
     label_3:
@@ -266,6 +283,7 @@ scripts.add("Class: " + className.image);
 scripts.add("Superclass: " + part.image);
 }
 
+// method declaration - used by script declaration
   static final public void MethodDeclaration() throws ParseException {Token methodName;
     methodName = jj_consume_token(DEF);
     jj_consume_token(HANDLEEVENT);
@@ -277,6 +295,7 @@ scripts.add("Superclass: " + part.image);
 scripts.add("Method: " + methodName.image);
 }
 
+// single coordinate pair
   static final public void Coordinate(List<Location> locList) throws ParseException {Token x;
     Token y;
     jj_consume_token(LPAREN);
@@ -287,11 +306,13 @@ scripts.add("Method: " + methodName.image);
 locList.add(new Location(Integer.parseInt(x.image), Integer.parseInt(y.image)));
 }
 
+// at declaration (proceeds list of locations)
   static final public void AtDeclaration(List<Location> locList) throws ParseException {
     jj_consume_token(AT);
     CoordinateList(locList);
 }
 
+// list of coordinate pairs 
   static final public void CoordinateList(List<Location> locList) throws ParseException {
     Coordinate(locList);
     label_4:
@@ -310,12 +331,14 @@ locList.add(new Location(Integer.parseInt(x.image), Integer.parseInt(y.image)));
     }
 }
 
+// message declaration
   static final public void MessageDeclaration() throws ParseException {Token msgToken;
     jj_consume_token(MESSAGE);
     msgToken = jj_consume_token(STRING_LITERAL);
 message = msgToken.image.substring(1, msgToken.image.length() - 1);
 }
 
+// statement block declaration
   static final public void StatementBlock() throws ParseException {
     jj_consume_token(PRINT);
     jj_consume_token(LPAREN);
@@ -328,6 +351,7 @@ message = msgToken.image.substring(1, msgToken.image.length() - 1);
 scripts.add("Statement: print(api.getSomeInfo())");
 }
 
+// requires declaration (for required items) - used by obstacle declaration
   static final public void RequiresDeclaration(List<Item> requiredItems) throws ParseException {Token itemToken;
     List<String> tempItems = new ArrayList<>();
     jj_consume_token(REQUIRES);

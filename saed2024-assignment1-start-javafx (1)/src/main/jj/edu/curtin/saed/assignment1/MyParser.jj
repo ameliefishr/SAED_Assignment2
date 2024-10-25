@@ -10,7 +10,9 @@ import edu.curtin.saed.assignment1.ParseException;
 import java.util.*;
 import java.io.*;
 
-public class MyParser {
+public class MyParser
+{
+    // class variables 
     public static int rows;
     public static int cols;
     public static int startRow;
@@ -22,11 +24,13 @@ public class MyParser {
     public static String message;
     public static Game game; // game instance
 
+    // lists to store plugins, items, scripts and obstacles
     private static List<Item> items = new ArrayList<>();
     private static List<Obstacle> obstacles = new ArrayList<>();
     private static List<String> plugins = new ArrayList<>();
     private static List<String> scripts = new ArrayList<>();
 
+    // function to parse the input file
     public static void parseFile(FileReader fileReader) throws ParseException, FileNotFoundException {
 
         MyParser parser = new MyParser(fileReader);
@@ -53,14 +57,16 @@ public class MyParser {
         Location playerLocation = new Location(startRow, startCol);
         Location goalLocation = new Location(goalRow, goalCol);
 
-        // items, obstacles etc. are empty to start with, only startup variables are initialized
+        // majority of the variables in game are empty to start, will be populated later on
         game = new Game(playerLocation, goalLocation, new ArrayList<>(), new ArrayList<>());
 
+        // print for debugging <- REMOVE FOR SUBMISSIOn
         System.out.println("Game Initialized:");
         System.out.println("Player Start Location: " + playerLocation.toString());
         System.out.println("Goal Location: " + goalLocation.toString());
     }
 
+    // parses coordinate string into an int array of x and y coords so can be made into location object
     private static int[] parseCoordinates(String coordStr) {
         String[] parts = coordStr.split(","); 
         int x = Integer.parseInt(parts[0].trim());
@@ -76,11 +82,12 @@ public class MyParser {
 
 PARSER_END(MyParser)
 
-
+// things to skip when parsing
 SKIP : {
     " " | "\t" | "\r" | "\n" // Skip spaces, tabs, and newlines
 }
 
+// token definitions
 TOKEN : {
     <SIZE: "size"> |
     <START: "start"> |
@@ -109,18 +116,22 @@ TOKEN : {
     <EXCLAMATION: "!"> 
 }
 
+// statup declarations, defines the structure & order of which to parse the input file
 void StartupDeclarations() : 
 {
 } 
 {
+    // always read these first, and only once
     SizeDeclaration() 
     StartDeclaration() 
     GoalDeclaration()
 
+    // initialize game object with the initial variables (size, start, goal)
     {
         initializeGame();
     }
 
+    // check for any number or combination of plugin, script, item or obstacle declaration
     ( LOOKAHEAD(1) 
         ( 
             ItemDeclaration() 
@@ -135,7 +146,7 @@ void StartupDeclarations() :
 }
 
 
-
+// game size declaration
 void SizeDeclaration() : 
 {
     Token rowToken;
@@ -153,6 +164,7 @@ void SizeDeclaration() :
     }
 }
 
+// start location declaration
 void StartDeclaration() : 
 {
     Token startRowToken;
@@ -169,6 +181,7 @@ void StartDeclaration() :
     }
 }
 
+// goal location declaration
 void GoalDeclaration() : 
 {
     Token goalRowToken;
@@ -185,6 +198,7 @@ void GoalDeclaration() :
     }
 }
 
+// item declaration
 void ItemDeclaration() : 
 {
     Token nameToken; 
@@ -203,6 +217,7 @@ void ItemDeclaration() :
     }
 }
 
+// obstacle declaration
 void ObstacleDeclaration() : 
 {
     List<Location> locList = new ArrayList<>();
@@ -220,7 +235,7 @@ void ObstacleDeclaration() :
     }
 }
 
-
+// plugin declaration
 void PluginDeclarations() : 
 {
     Token pluginName;
@@ -233,6 +248,7 @@ void PluginDeclarations() :
     }
 }
 
+// used in plugin declaration
 void QualifiedName() : 
 {
     Token part;
@@ -252,6 +268,7 @@ void QualifiedName() :
     }
 }
 
+// script declaration
 void ScriptDeclarations() : 
 {
     Token scriptName;
@@ -264,6 +281,7 @@ void ScriptDeclarations() :
     }
 }
 
+// script block declaration - used in script declaration
 void ScriptBlock() : 
 {
 } 
@@ -271,6 +289,7 @@ void ScriptBlock() :
     <CLASS> ClassDeclaration() 
 }
 
+// class declaration - used in script declaration
 void ClassDeclaration() : 
 {
     Token className, superClass;
@@ -282,6 +301,7 @@ void ClassDeclaration() :
     }
 }
 
+// qualified name for script declaration (differs to the one for plugin)
 void QualifiedNameScript() : 
 {
     Token part;
@@ -293,6 +313,7 @@ void QualifiedNameScript() :
     }
 }
 
+// method declaration - used by script declaration
 void MethodDeclaration() : 
 {
     Token methodName;
@@ -304,6 +325,7 @@ void MethodDeclaration() :
     }
 }
 
+// single coordinate pair
 void Coordinate(List<Location> locList) : 
 {
     Token x; 
@@ -316,6 +338,7 @@ void Coordinate(List<Location> locList) :
     }
 }
 
+// at declaration (proceeds list of locations)
 void AtDeclaration(List<Location> locList) : 
 {
 } 
@@ -323,6 +346,7 @@ void AtDeclaration(List<Location> locList) :
     <AT> CoordinateList(locList)
 }
 
+// list of coordinate pairs 
 void CoordinateList(List<Location> locList) : 
 {
 } 
@@ -330,6 +354,7 @@ void CoordinateList(List<Location> locList) :
     Coordinate(locList) ( <COMMA> Coordinate(locList) )*
 }
 
+// message declaration
 void MessageDeclaration() : 
 {
     Token msgToken;
@@ -341,6 +366,7 @@ void MessageDeclaration() :
     }
 }
 
+// statement block declaration
 void StatementBlock() : 
 {
 } 
@@ -351,6 +377,7 @@ void StatementBlock() :
     }
 }
 
+// requires declaration (for required items) - used by obstacle declaration
 void RequiresDeclaration(List<Item> requiredItems) : 
 { 
     Token itemToken; 
