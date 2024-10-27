@@ -25,11 +25,8 @@ public class MyParser implements MyParserConstants {
     private static List<String> scripts = new ArrayList<>();
 
     // function to parse the input file
-    public static void parseFile(FileReader fileReader) throws ParseException, FileNotFoundException {
-
-        MyParser parser = new MyParser(fileReader);
-
-        MyParser.StartupDeclarations();
+    public void parseFile() throws ParseException, FileNotFoundException {
+        StartupDeclarations();
         game.setGridWidth(rows);
         game.setGridHeight(cols);
 

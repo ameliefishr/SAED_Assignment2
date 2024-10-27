@@ -10,7 +10,8 @@ import javafx.scene.input.KeyEvent;
 
 import edu.curtin.saed.api.*;
 
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import java.text.Normalizer;
-//import java.nio.charset.Charset;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * JavaFX GUI application that integrates with the parser.
@@ -77,7 +80,15 @@ public class App extends Application
         {
             return;
         }
+        
         Game gameInstance = MyParser.getGameInstance();
+
+        if (gameInstance == null)
+        {
+            // game was not initialized, can be caused by error parsing file
+            return;
+        }
+
         cheatMode = gameInstance.getCheatMode();
 
         int gridWidth = gameInstance.getGridWidth();
@@ -321,7 +332,7 @@ public class App extends Application
                     }
                     break;
                 case S:  // S = move down
-                    if (y < gridHeight - 1)
+                    if (y < gridHeight)
                     {
                         tempY++;
                         gameInstance.setMovementDirection("down");   
@@ -525,21 +536,32 @@ public class App extends Application
     // parse configuration file from cmd line to parser to process 
     private void parseConfigurationFile(String filename)
     {
-        //String pathToFile = "input.dsl"; // hardcoded input file for testing 
-        //Charset charset;
+         
+        Charset charset = null;
 
-        // TO DO: encoding
-
-        //if (filename.endsWith(".utf8.map"))
-        //{
-        //    charset = Charset.forName("UTF-8");
-        //}
-        try (FileReader fileReader = new FileReader(filename))
+        // determine what type of encoding file is in based off file extension
+        // note: this just guesses based off the file extension and assumes files will be in their claimed format
+        if (filename.endsWith(".utf8.map"))
         {
-            MyParser.parseFile(fileReader); 
+            charset = StandardCharsets.UTF_8;
+        }
+        else if (filename.endsWith(".utf16.map"))
+        {
+            charset = StandardCharsets.UTF_16;
+        }
+        else
+        {
+            System.out.println("Unsupported encoding. Accepted encodings: UTF8, UTF16");
+            return;
+        }
+
+        try (InputStreamReader fileReader = new InputStreamReader(new FileInputStream(filename), charset))
+        {
+            MyParser parser = new MyParser(fileReader);
+            parser.parseFile(); 
             System.out.println("File parsed successfully! :D");
-        } 
-        catch (IOException | ParseException e) 
+        }
+        catch (IOException | ParseException e)
         {
             System.out.println("Error parsing file: " + e.getMessage());
         }
