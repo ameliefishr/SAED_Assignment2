@@ -312,7 +312,7 @@ tempItems.add(itemToken.image);
         for (String item : tempItems)
         {
             String itemName = item.substring(1, item.length() - 1); // 1, -1 to remove the "" quotes
-            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "n/a")); // message does not matter here, only the item name
+            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "n/a")); // message does not matter here, only the item name for comparison purposes
         }
 }
 

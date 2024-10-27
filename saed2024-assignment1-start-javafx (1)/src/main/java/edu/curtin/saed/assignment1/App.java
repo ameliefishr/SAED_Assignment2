@@ -316,25 +316,29 @@ public class App extends Application
                 case W:  // W = move up
                     if (y > 0)
                     {
-                        tempY--;  
+                        tempY--; 
+                        gameInstance.setMovementDirection("up"); 
                     }
                     break;
                 case S:  // S = move down
                     if (y < gridHeight - 1)
                     {
-                        tempY++;  
+                        tempY++;
+                        gameInstance.setMovementDirection("down");   
                     }
                     break;
                 case A:  // A: move left
                     if (x > 0)
                     {
-                        tempX--;  
+                        tempX--;
+                        gameInstance.setMovementDirection("left");   
                     }
                     break;
                 case D:  // D: move right
                     if (x < gridWidth - 1)
                     {
-                        tempX++;  
+                        tempX++;
+                        gameInstance.setMovementDirection("right");   
                     }
                     break;
                 default:
@@ -365,8 +369,9 @@ public class App extends Application
                         {
                             String normalizedRequiredItemName = Normalizer.normalize(requiredItem.getName(), Normalizer.Form.NFC);
                             // check if the player's inventory contains the item required to clear the obstcle
-                            for (String itemName : player.getInventory().keySet())
+                            for (Item item : player.getInventory().keySet())
                             {
+                                String itemName = item.getName();
                                 String normalizedItemName = Normalizer.normalize(itemName, Normalizer.Form.NFC);
                                 // if the user has the required item
                                 if (normalizedItemName.equals(normalizedRequiredItemName))
@@ -392,7 +397,7 @@ public class App extends Application
                                         area.requestLayout(); 
                                     });
 
-                                    player.removeItemFromInventory(itemName);
+                                    player.removeItemFromInventory(item);
                                     textArea.appendText(obstaclePassed1 + " " + requiredItem.getName() + " " + obstaclePassed2);
                                     updateInventoryDisplay(inventoryText);
                                     
@@ -508,9 +513,9 @@ public class App extends Application
         if (inventoryText != null)
         {
             StringBuilder inventory = new StringBuilder(inventoryText);
-            for (Map.Entry<String, Integer> entry : player.getInventory().entrySet())
+            for (Map.Entry<Item, Integer> entry : player.getInventory().entrySet())
             {
-                inventory.append("-> ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                inventory.append("-> ").append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
             }
             inventoryDisplay.setText(inventory.toString());
         }

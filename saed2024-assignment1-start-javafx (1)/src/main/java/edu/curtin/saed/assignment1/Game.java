@@ -18,6 +18,7 @@ public class Game
     private GameAPI api;
     private ScriptHandler scriptHandler;
     private boolean cheatMode;
+    private String movementDirection;
 
     // constructor
     public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList)
@@ -32,6 +33,7 @@ public class Game
         this.plugins = new ArrayList<>();
         this.player = new Player(playerLocation);
         this.cheatMode = false;
+        this.movementDirection = "Idle";
     }
 
     public void initializeAPI()
@@ -81,9 +83,20 @@ public class Game
         return this.items;
     }
 
+    public String getMovementDirection()
+    {
+        return this.movementDirection;
+    }
+
     public List<Script> getScripts()
     {
         return this.scripts;
+    }
+
+    public int[] getGridSize()
+    {
+        int[] gridSize = new int[] {this.gridWidth, this.gridHeight}; //to access -> int[0] = grid width & int[1] = grid height
+        return gridSize;
     }
 
     public ScriptHandler initializeScriptHandler()
@@ -96,6 +109,45 @@ public class Game
     {
         return this.api;
     }
+
+    // getContents method for API
+    // returns whatever object is found, i.e. could be player, goal, item or obstacle
+    // when accessing will need to use instanceof to determine type
+    public Object getContentsAtLocation(Location location)
+    {
+        // check if player object is at specified location
+        if (player.getLocation() == location)
+        {
+            return player; 
+        }
+    
+        // check if player object is at specified location
+        for (Item item : items)
+        {
+            if (item.getLocations().contains(location))
+            {
+                return item; 
+            }
+        }
+    
+        // check if player object is at specified location
+        for (Obstacle obstacle : obstacles)
+        {
+            if (obstacle.getLocation() == location)
+            { 
+                return obstacle; 
+            }
+        }
+    
+        // check if player object is at specified location
+        if (goalLocation == location)
+        {
+            return goalLocation; 
+        }
+    
+        return null; // if no object is found at location return null
+    }
+    
 
     // setters
     public void setPlayerStartLocation(Location playerLocation)
@@ -115,7 +167,6 @@ public class Game
 
     public void setCheatMode(boolean mode)
     {
-        //System.out.println("setCheatMode called: " + mode);
         this.cheatMode = mode;
     }
 
@@ -138,6 +189,11 @@ public class Game
     public void addItem(Item item)
     {
         this.items.add(item); 
+    }
+
+    public void setMovementDirection(String direction)
+    {
+        this.movementDirection = direction;
     }
     
     public void removeItem(Item item)
@@ -215,12 +271,9 @@ public class Game
             // bool to check whether icon should be revealed
             boolean reveal = false;
 
-            //System.out.println("cheat mode not activated, reveal is still false");
-
-            if(cheatMode)
+            if(cheatMode) // if cheat mode activated set everything to reveal
             {
                 reveal = true;
-                //System.out.println("cheat mode activated, reveal set to true");
             }
             
             // iterate over reveal array and check whether the current icon's coords match any coords in reveal array
@@ -290,7 +343,6 @@ public class Game
     public class GameEventHandler implements GameAPI.ItemListener {
         @Override
         public void onItemPickup(Item item) {
-            //System.out.println("EVENT HANDLER: Item picked up: " + item);
             scriptHandler.loadScript(item);
         }
     }
