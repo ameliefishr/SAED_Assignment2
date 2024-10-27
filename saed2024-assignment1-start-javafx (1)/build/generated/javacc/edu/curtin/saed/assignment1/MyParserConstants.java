@@ -31,35 +31,27 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int SCRIPT = 14;
   /** RegularExpression Id. */
-  int CLASS = 15;
+  int CODE = 15;
   /** RegularExpression Id. */
-  int DEF = 16;
+  int IDENTIFIER = 16;
   /** RegularExpression Id. */
-  int HANDLEEVENT = 17;
+  int DOT = 17;
   /** RegularExpression Id. */
-  int PRINT = 18;
+  int LPAREN = 18;
   /** RegularExpression Id. */
-  int IDENTIFIER = 19;
+  int RPAREN = 19;
   /** RegularExpression Id. */
-  int DOT = 20;
+  int LBRACE = 20;
   /** RegularExpression Id. */
-  int LPAREN = 21;
+  int RBRACE = 21;
   /** RegularExpression Id. */
-  int RPAREN = 22;
+  int COMMA = 22;
   /** RegularExpression Id. */
-  int LBRACE = 23;
+  int STRING_LITERAL = 23;
   /** RegularExpression Id. */
-  int RBRACE = 24;
+  int NUMBER = 24;
   /** RegularExpression Id. */
-  int COMMA = 25;
-  /** RegularExpression Id. */
-  int STRING_LITERAL = 26;
-  /** RegularExpression Id. */
-  int NUMBER = 27;
-  /** RegularExpression Id. */
-  int COLON = 28;
-  /** RegularExpression Id. */
-  int EXCLAMATION = 29;
+  int COLON = 25;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -81,10 +73,7 @@ public interface MyParserConstants {
     "\"requires\"",
     "\"plugin\"",
     "\"script\"",
-    "\"class\"",
-    "\"def\"",
-    "\"handleEvent\"",
-    "\"print\"",
+    "<CODE>",
     "<IDENTIFIER>",
     "\".\"",
     "\"(\"",
@@ -95,7 +84,6 @@ public interface MyParserConstants {
     "<STRING_LITERAL>",
     "<NUMBER>",
     "\":\"",
-    "\"!\"",
   };
 
 }

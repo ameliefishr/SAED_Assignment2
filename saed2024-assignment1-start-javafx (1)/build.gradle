@@ -6,12 +6,21 @@ plugins {
     id "org.javacc.javacc" version "3.0.2" 
 }
 
+dependencies {
+    implementation 'org.python:jython-standalone:2.7.1'
+}
+
+
 repositories {
     mavenCentral()
 }
 
 application {
     mainClass = "edu.curtin.saed.assignment1.App"
+}
+
+run {
+    standardInput = System.in
 }
 
 javafx {
@@ -30,7 +39,7 @@ pmd {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', 'src/main/jj'] 
+            srcDirs = ['src/main/java', 'src/main/jj', 'api/src/main/java/edu/curtin/saed/api'] 
         }
     }
 }

@@ -2,6 +2,7 @@ package edu.curtin.saed.assignment1;
 
 import java.util.ArrayList;
 import java.util.List;
+import edu.curtin.saed.api.*;
 
 public class Game
 {
@@ -14,25 +15,40 @@ public class Game
     private List<Script> scripts; 
     private List<Plugin> plugins;
     private Player player;
+    private GameAPI api;
+    private ScriptHandler scriptHandler;
+    private boolean cheatMode;
 
     // constructor
     public Game(Location playerLocation, Location goalLocation, List<Item> itemList, List<Obstacle> obstacleList)
     {
         this.gridWidth = 10; // default size if none is given
-        this.gridHeight = 10; 
+        this.gridHeight = 10;
         this.playerStartLocation = playerLocation;
         this.goalLocation = goalLocation;
-        this.items = (itemList != null) ? itemList : new ArrayList<>(); 
-        this.obstacles = (obstacleList != null) ? obstacleList : new ArrayList<>(); 
-        this.scripts = new ArrayList<>(); 
+        this.items = (itemList != null) ? itemList : new ArrayList<>();
+        this.obstacles = (obstacleList != null) ? obstacleList : new ArrayList<>();
+        this.scripts = new ArrayList<>();
         this.plugins = new ArrayList<>();
         this.player = new Player(playerLocation);
+        this.cheatMode = false;
+    }
+
+    public void initializeAPI()
+    {
+        this.api = new GameAPI(this); 
+        this.api.registerItemListener(new GameEventHandler());
     }
 
     // getters
     public int getGridWidth()
     { 
         return this.gridWidth; 
+    }
+
+    public boolean getCheatMode()
+    {
+        return this.cheatMode;
     }
 
     public List<Obstacle> getObstacles()
@@ -70,6 +86,17 @@ public class Game
         return this.scripts;
     }
 
+    public ScriptHandler initializeScriptHandler()
+    {
+        this.scriptHandler = new ScriptHandler(api); 
+        return scriptHandler;
+    }
+
+    public GameAPI getAPI()
+    {
+        return this.api;
+    }
+
     // setters
     public void setPlayerStartLocation(Location playerLocation)
     {
@@ -84,6 +111,12 @@ public class Game
     public void setGoalLocation(Location goalLocation)
     {
         this.goalLocation = goalLocation;
+    }
+
+    public void setCheatMode(boolean mode)
+    {
+        //System.out.println("setCheatMode called: " + mode);
+        this.cheatMode = mode;
     }
 
     public void setGridWidth(int gridWidth)
@@ -181,6 +214,14 @@ public class Game
             
             // bool to check whether icon should be revealed
             boolean reveal = false;
+
+            //System.out.println("cheat mode not activated, reveal is still false");
+
+            if(cheatMode)
+            {
+                reveal = true;
+                //System.out.println("cheat mode activated, reveal set to true");
+            }
             
             // iterate over reveal array and check whether the current icon's coords match any coords in reveal array
             for (double[] coords : squaresToReveal)
@@ -218,7 +259,6 @@ public class Game
             }
         });
     }
-    
 
     @Override
     public String toString()
@@ -246,4 +286,13 @@ public class Game
         }
         return sb.toString();
     }
+
+    public class GameEventHandler implements GameAPI.ItemListener {
+        @Override
+        public void onItemPickup(Item item) {
+            //System.out.println("EVENT HANDLER: Item picked up: " + item);
+            scriptHandler.loadScript(item);
+        }
+    }
+    
 }

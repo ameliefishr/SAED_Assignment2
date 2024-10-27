@@ -8,6 +8,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.input.KeyEvent;
 
+import edu.curtin.saed.api.*;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.text.Normalizer;
-import java.nio.charset.Charset;
+//import java.nio.charset.Charset;
 
 /**
  * JavaFX GUI application that integrates with the parser.
@@ -45,9 +47,9 @@ public class App extends Application
     private Date date;
     private Locale locale;
     private int dayCount;
+    private boolean cheatMode;
     private static String filename;
     private static Player player;
-    private static final boolean CHEAT_MODE = false; // manually adjust this value to toggle on/off cheat mode
     private static final boolean SHOW_CAPTIONS = false; // manually adjust this value to toggle icon captions on/off 
 
     public static void main(String[] args)
@@ -76,6 +78,7 @@ public class App extends Application
             return;
         }
         Game gameInstance = MyParser.getGameInstance();
+        cheatMode = gameInstance.getCheatMode();
 
         int gridWidth = gameInstance.getGridWidth();
         int gridHeight = gameInstance.getGridHeight();
@@ -110,7 +113,7 @@ public class App extends Application
 
         goalIcon.setShownCaption(SHOW_CAPTIONS);
 
-        if(!CHEAT_MODE)
+        if(!cheatMode)
         {
             goalIcon.setShown(false);
         }
@@ -148,7 +151,7 @@ public class App extends Application
                     item.getName()
                 );
                 itemIcon.setShownCaption(SHOW_CAPTIONS);
-                if(!CHEAT_MODE)
+                if(!cheatMode)
                 {
                     itemIcon.setShown(false);
                 }
@@ -189,7 +192,7 @@ public class App extends Application
                     "Obstacle"
                 );
                 obstacleIcon.setShownCaption(SHOW_CAPTIONS);
-                if(!CHEAT_MODE)
+                if(!cheatMode)
                 {
                     obstacleIcon.setShown(false);
                 }
@@ -202,7 +205,7 @@ public class App extends Application
             gameInstance.removeObstacle(obstacle);
         }
 
-        if (!CHEAT_MODE)
+        if (!cheatMode)
         {
             // add our "hidden" icon to every square of the grid, this is how i control what my player cam see
             for (int i = 0; i < gridWidth+1; i++)
@@ -238,6 +241,11 @@ public class App extends Application
         congratsText = "Congratulations!";
         summaryText = "You have completed the game.\nTotal days taken:";
         dayCount = 0;
+
+        gameInstance.initializeAPI();
+        gameInstance.initializeScriptHandler();
+        GameAPI api = gameInstance.getAPI();
+        //criptHandler.loadScript(null);
 
         TextField localeInput = new TextField();
         localeInput.setPromptText("Enter IETF Language Tag (e.g., en-AU)");
@@ -420,10 +428,8 @@ public class App extends Application
                 player.setLocation(new Location(tempX, tempY));
                 playerIcon.setPosition(tempX, tempY);
                 area.requestLayout(); 
-                if(!CHEAT_MODE)
-                {
-                    gameInstance.revealArea(player.getLocation(), area); 
-                }
+                gameInstance.revealArea(player.getLocation(), area); 
+
             }
             
             // after all player movement is complete, check if they have reached the goal
@@ -453,7 +459,10 @@ public class App extends Application
                     {
                         // add to inventory and rmeove from game
                         player.addItemToInventory(item);
-                        textArea.appendText(pickedUpString + " " +  item.getName() + "\n");
+                        api.itemPickup(item); // trigger onItemPickup event listener
+                        gameInstance.revealArea(player.getLocation(), area);
+                        textArea.appendText("\n" + pickedUpString + " " +  item.getName() + "\n");
+                        textArea.appendText((item.getMessage()) + "\n");
                         updateInventoryDisplay(inventoryText);
                         
                         // since items can have multiple locations you are only removing the item at that specific location
@@ -595,6 +604,5 @@ public class App extends Application
         dayCount++;
 
         return dateText;
-    }
-    
+    }    
 }

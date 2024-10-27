@@ -12,6 +12,11 @@ item "Rock" {
     message "A cool rock."
 }
 
+item "map" {
+    at (2,4)
+    message "Suddenly you can see."
+}
+
 obstacle {
     at (1,1)
     requires "Wooden Sword"
@@ -20,7 +25,20 @@ obstacle {
 plugin org.example.myplugins.PluginX
 
 script !{
-class MyCallback(edu.curtin.game.Callback):
-    def handleEvent(e):
-        print(api.getSomeInfo())
+print("starting Reveal python script...")
+
+class Reveal:
+    def __init__(self, api):
+        self.api = api
+        print("Reveal script running")
+
+    def onItemAcquired(self, item):
+        print("Item acquired: "+ item.getName())
+        if "map" in item.getName().lower():
+            print("Revealing goal and hidden items.")
+            self.api.toggleReveal(True)
+            print("Goal and hidden items revealed.")
+
+reveal = Reveal(api)
 }
+

@@ -2,38 +2,34 @@ package edu.curtin.saed.assignment1;
 
 public class Script
 {
-    private String className;
-    private String superclassName;
-    private String methodName;
-    private String statement;
+    private String content;
 
-    // setters
-    public void setClassName(String className)
+    public Script(String content)
     {
-        this.className = className;
+        this.content = content;
     }
 
-    public void setSuperclassName(String superclassName)
+    public void setScriptCode(String newContent)
     {
-        this.superclassName = superclassName;
+        this.content = newContent;
+    }
+    
+    public String getScriptCode()
+    {
+        return this.content;
     }
 
-    public void setMethodName(String methodName)
+    public void handleItemPickup(Item item)
     {
-        this.methodName = methodName;
+        System.out.println("script triggered for item pickup: " + item.getName());
     }
 
-    public void setStatement(String statement)
-    {
-        this.statement = statement;
-    }
 
     // TO DO: getters
 
     @Override
     public String toString()
     {
-        return "Script [className=" + className + ", superclassName=" + superclassName +
-               ", methodName=" + methodName + ", statement=" + statement + "]";
+        return "Script [content=\n" + content + "]";
     }
 }

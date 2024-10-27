@@ -2,11 +2,6 @@ PARSER_BEGIN(MyParser)
 
 package edu.curtin.saed.assignment1;
 
-import edu.curtin.saed.assignment1.MyParserTokenManager;
-import edu.curtin.saed.assignment1.Token;
-import edu.curtin.saed.assignment1.SimpleCharStream;
-import edu.curtin.saed.assignment1.ParseException;
-
 import java.util.*;
 import java.io.*;
 
@@ -51,6 +46,7 @@ public class MyParser
         System.out.println("Obstacles: " + obstacles);
         System.out.println("Plugins: " + plugins);
         System.out.println("Scripts: " + scripts);
+        System.out.println("Script count: " + scripts.size());
     }
 
     private static void initializeGame() {
@@ -88,6 +84,7 @@ SKIP : {
 }
 
 // token definitions
+// Updated token definitions
 TOKEN : {
     <SIZE: "size"> |
     <START: "start"> |
@@ -98,11 +95,8 @@ TOKEN : {
     <OBSTACLE: "obstacle"> |
     <REQUIRES: "requires"> |
     <PLUGIN: "plugin"> |
-    <SCRIPT: "script"> | 
-    <CLASS: "class"> |
-    <DEF: "def"> |
-    <HANDLEEVENT: "handleEvent"> |
-    <PRINT: "print"> |
+    <SCRIPT: "script"> |
+    <CODE: "!{" (~["}"])* "}">  | 
     <IDENTIFIER: (["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* )> | 
     <DOT: "."> | 
     <LPAREN: "("> |
@@ -112,9 +106,9 @@ TOKEN : {
     <COMMA: ","> |
     <STRING_LITERAL: "\"" (~["\""])* "\"" > |
     <NUMBER: (["0"-"9"])+> |
-    <COLON: ":"> |
-    <EXCLAMATION: "!"> 
+    <COLON: ":"> 
 }
+
 
 // statup declarations, defines the structure & order of which to parse the input file
 void StartupDeclarations() : 
@@ -268,60 +262,21 @@ void QualifiedName() :
     }
 }
 
-// script declaration
 void ScriptDeclarations() : 
 {
-    Token scriptName;
+    Token codeBlock;
 } 
 {
-    <SCRIPT> <EXCLAMATION> <LBRACE> ScriptBlock() <RBRACE> 
+    <SCRIPT> codeBlock = <CODE> 
     {
-        //System.out.println("Parsed Script:");
-        //System.out.println(scripts);
-    }
-}
+        // Store the parsed script content
+        String scriptContent = codeBlock.image.substring(2, codeBlock.image.length() - 1);
+        System.out.println("Parsed script: " + scriptContent); // Debug output
+        scripts.add(scriptContent);
 
-// script block declaration - used in script declaration
-void ScriptBlock() : 
-{
-} 
-{
-    <CLASS> ClassDeclaration() 
-}
-
-// class declaration - used in script declaration
-void ClassDeclaration() : 
-{
-    Token className, superClass;
-} 
-{
-    className = <IDENTIFIER> <LPAREN> QualifiedNameScript() <RPAREN> <COLON> MethodDeclaration() 
-    {
-        scripts.add("Class: " + className.image);
-    }
-}
-
-// qualified name for script declaration (differs to the one for plugin)
-void QualifiedNameScript() : 
-{
-    Token part;
-} 
-{
-    part = <IDENTIFIER> ( <DOT> part = <IDENTIFIER> )* 
-    {
-        scripts.add("Superclass: " + part.image);  
-    }
-}
-
-// method declaration - used by script declaration
-void MethodDeclaration() : 
-{
-    Token methodName;
-} 
-{
-    methodName = <DEF> <HANDLEEVENT> <LPAREN> <IDENTIFIER> <RPAREN> <COLON> StatementBlock() 
-    {
-        scripts.add("Method: " + methodName.image);
+        // Add script to game
+        Script script = new Script(scriptContent);
+        game.addScript(script);
     }
 }
 
@@ -366,17 +321,6 @@ void MessageDeclaration() :
     }
 }
 
-// statement block declaration
-void StatementBlock() : 
-{
-} 
-{
-    <PRINT> <LPAREN> <IDENTIFIER> <DOT> <IDENTIFIER> <LPAREN> <RPAREN> <RPAREN> 
-    {
-        scripts.add("Statement: print(api.getSomeInfo())");
-    }
-}
-
 // requires declaration (for required items) - used by obstacle declaration
 void RequiresDeclaration(List<Item> requiredItems) : 
 { 
@@ -388,9 +332,10 @@ void RequiresDeclaration(List<Item> requiredItems) :
     {
         tempItems.add(itemToken.image);
         
-        for (String item : tempItems) {
+        for (String item : tempItems)
+        {
             String itemName = item.substring(1, item.length() - 1); // 1, -1 to remove the "" quotes
-            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "Some String")); 
+            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "n/a")); // message does not matter here, only the item name for comparison purposes
         }
     }
 }
