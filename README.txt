@@ -37,3 +37,7 @@ KNOWN ISSUES:
   a non-static way, I kept getting these from some of my auto-generated jj files despite
   them not being in my src, I tried fixing the errors but could not figure it out + weren't
   many online resources
+
+- I know my coupling is pretty terrible, I made the mistake of making everything in one
+  gradle project then trying to split it into sub-projects at the very end only to find 
+  out I had many circular dependencies which I had to find workarounds for (lesson learned)

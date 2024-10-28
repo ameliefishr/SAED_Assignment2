@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd xmlns="http://pmd.sourceforge.net/report/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pmd.sourceforge.net/report/2.0.0 https://pmd.github.io/schema/report_2_0_0.xsd" version="7.3.0" timestamp="2024-10-28T12:04:27.271">
+<file name="C:\Users\Amelie\SAED_Assignment2-1\saed2024-assignment1-start-javafx (1)\api\src\main\java\edu\curtin\saed\api\edu\curtin\saed\api\PluginInterface.java">
+<violation beginline="20" endline="20" begincolumn="16" endcolumn="25" rule="AvoidCatchingGenericException" ruleset="Design" package="edu.curtin.saed.api" class="PluginInterface" method="loadPlugin" externalInfoUrl="https://docs.pmd-code.org/pmd-doc-7.3.0/pmd_rules_java_design.html#avoidcatchinggenericexception" priority="3">
+Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+</violation>
+</file>
+<file name="C:\Users\Amelie\SAED_Assignment2-1\saed2024-assignment1-start-javafx (1)\api\src\main\java\edu\curtin\saed\api\edu\curtin\saed\api\ScriptHandler.java">
+<violation beginline="39" endline="39" begincolumn="16" endcolumn="25" rule="AvoidCatchingGenericException" ruleset="Design" package="edu.curtin.saed.api" class="ScriptHandler" method="executeScript" externalInfoUrl="https://docs.pmd-code.org/pmd-doc-7.3.0/pmd_rules_java_design.html#avoidcatchinggenericexception" priority="3">
+Avoid catching generic exceptions such as NullPointerException, RuntimeException, Exception in try-catch block
+</violation>
+</file>
+</pmd>

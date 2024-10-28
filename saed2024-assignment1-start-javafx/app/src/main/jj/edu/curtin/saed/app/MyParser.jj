@@ -1,0 +1,348 @@
+PARSER_BEGIN(MyParser)
+
+package edu.curtin.saed.app;
+
+import edu.curtin.saed.api.*;
+import edu.curtin.saed.models.AppInterface;
+import edu.curtin.saed.models.Item;
+import edu.curtin.saed.models.Obstacle;
+import edu.curtin.saed.models.Player;
+import edu.curtin.saed.models.Location;
+import edu.curtin.saed.models.Script;
+import edu.curtin.saed.models.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.io.FileNotFoundException;
+
+public class MyParser
+{
+    // class variables 
+    public static int rows;
+    public static int cols;
+    public static int startRow;
+    public static int startCol;
+    public static int goalRow;
+    public static int goalCol;
+    public static String name;
+    public static List<String> coordinates = new ArrayList<>();
+    public static String message;
+    public static Game game; // game instance
+
+    // lists to store plugins, items, scripts and obstacles
+    private static List<Item> items = new ArrayList<>();
+    private static List<Obstacle> obstacles = new ArrayList<>();
+    private static List<String> plugins = new ArrayList<>();
+    private static List<String> scripts = new ArrayList<>();
+
+    // function to parse the input file
+    public void parseFile() throws ParseException, FileNotFoundException {
+        StartupDeclarations();  
+        game.setGridWidth(rows);
+        game.setGridHeight(cols);
+        
+        // printing for parser debugging <- REMOVE FOR FINAL SUBMISSION
+        System.out.println("Parsed Game Variables:");
+        System.out.println("Size: " + rows + " x " + cols);
+        System.out.println("Start: (" + startRow + "," + startCol + ")");
+        System.out.println("Goal: (" + goalRow + "," + goalCol + ")");
+        System.out.println("Parsed Item: " + name);
+        System.out.println("Coordinates: " + coordinates);
+        System.out.println("Message: " + message);
+        System.out.println("Items: " + items);
+        System.out.println("Obstacles: " + obstacles);
+        System.out.println("Plugins: " + plugins);
+        System.out.println("Scripts: " + scripts);
+        System.out.println("Script count: " + scripts.size());
+    }
+
+    private static void initializeGame() {
+        Location playerLocation = new Location(startRow, startCol);
+        Location goalLocation = new Location(goalRow, goalCol);
+
+        // majority of the variables in game are empty to start, will be populated later on
+        game = new Game(playerLocation, goalLocation, new ArrayList<>(), new ArrayList<>());
+
+        // print for debugging <- REMOVE FOR SUBMISSIOn
+        System.out.println("Game Initialized:");
+        System.out.println("Player Start Location: " + playerLocation.toString());
+        System.out.println("Goal Location: " + goalLocation.toString());
+    }
+
+    // parses coordinate string into an int array of x and y coords so can be made into location object
+    private static int[] parseCoordinates(String coordStr) {
+        String[] parts = coordStr.split(","); 
+        int x = Integer.parseInt(parts[0].trim());
+        int y = Integer.parseInt(parts[1].trim()); 
+        return new int[]{x, y}; 
+    }
+
+// only call AFTER ininitalizeGame or game will be null
+    public static Game getGameInstance() {
+        return game; 
+    }    
+}
+
+PARSER_END(MyParser)
+
+// things to skip when parsing
+SKIP : {
+    " " | "\t" | "\r" | "\n" // Skip spaces, tabs, and newlines
+}
+
+// token definitions
+// Updated token definitions
+TOKEN : {
+    <SIZE: "size"> |
+    <START: "start"> |
+    <GOAL: "goal"> |
+    <ITEM: "item"> |
+    <AT: "at"> |
+    <MESSAGE: "message"> |
+    <OBSTACLE: "obstacle"> |
+    <REQUIRES: "requires"> |
+    <PLUGIN: "plugin"> |
+    <SCRIPT: "script"> |
+    <CODE: "!{" (~["}"])* "}">  | 
+    <IDENTIFIER: (["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])* )> | 
+    <DOT: "."> | 
+    <LPAREN: "("> |
+    <RPAREN: ")"> |
+    <LBRACE: "{"> |
+    <RBRACE: "}"> |
+    <COMMA: ","> |
+    <STRING_LITERAL: "\"" (~["\""])* "\"" > |
+    <NUMBER: (["0"-"9"])+> |
+    <COLON: ":"> 
+}
+
+
+// statup declarations, defines the structure & order of which to parse the input file
+void StartupDeclarations() : 
+{
+} 
+{
+    // always read these first, and only once
+    SizeDeclaration() 
+    StartDeclaration() 
+    GoalDeclaration()
+
+    // initialize game object with the initial variables (size, start, goal)
+    {
+        initializeGame();
+    }
+
+    // check for any number or combination of plugin, script, item or obstacle declaration
+    ( LOOKAHEAD(1) 
+        ( 
+            ItemDeclaration() 
+        | 
+            ObstacleDeclaration() 
+        | 
+            PluginDeclarations() 
+        | 
+            ScriptDeclarations() 
+        )
+    )*
+}
+
+
+// game size declaration
+void SizeDeclaration() : 
+{
+    Token rowToken;
+    Token colToken;
+} 
+{
+    <SIZE> <LPAREN> rowToken = <NUMBER> <COMMA> colToken = <NUMBER> <RPAREN>
+    {
+        rows = Integer.parseInt(rowToken.image);
+        cols = Integer.parseInt(colToken.image);
+        
+        if (rows < 1 || cols < 1) {
+            throw new ParseException("Invalid size values. Must be at least 1.");
+        }
+    }
+}
+
+// start location declaration
+void StartDeclaration() : 
+{
+    Token startRowToken;
+    Token startColToken;
+} 
+{
+    <START> <LPAREN> startRowToken = <NUMBER> <COMMA> startColToken = <NUMBER> <RPAREN>
+    {
+        startRow = Integer.parseInt(startRowToken.image);
+        startCol = Integer.parseInt(startColToken.image);
+        if (startRow < 0 || startRow >= rows || startCol < 0 || startCol >= cols) {
+            throw new ParseException("Invalid start location. Must be within grid bounds.");
+        }
+    }
+}
+
+// goal location declaration
+void GoalDeclaration() : 
+{
+    Token goalRowToken;
+    Token goalColToken;
+} 
+{
+    <GOAL> <LPAREN> goalRowToken = <NUMBER> <COMMA> goalColToken = <NUMBER> <RPAREN>
+    {
+        goalRow = Integer.parseInt(goalRowToken.image);
+        goalCol = Integer.parseInt(goalColToken.image);
+        if (goalRow < 0 || goalRow >= rows || goalCol < 0 || goalCol >= cols) {
+            throw new ParseException("Invalid goal location. Must be within grid bounds.");
+        }
+    }
+}
+
+// item declaration
+void ItemDeclaration() : 
+{
+    Token nameToken; 
+    List<Location> locList = new ArrayList<>();
+} 
+{
+    <ITEM> nameToken = <STRING_LITERAL> <LBRACE> AtDeclaration(locList) MessageDeclaration() <RBRACE>
+    {
+        name = nameToken.image.substring(1, nameToken.image.length() - 1); 
+        
+        List<Location> itemLocations = new ArrayList<>(locList);
+        
+        Item item = new Item(name, itemLocations, message);
+        items.add(item);
+        game.addItem(item);  
+    }
+}
+
+// obstacle declaration
+void ObstacleDeclaration() : 
+{
+    List<Location> locList = new ArrayList<>();
+    List<Item> requiredItems = new ArrayList<>();
+} 
+{
+    <OBSTACLE> <LBRACE> AtDeclaration(locList) RequiresDeclaration(requiredItems) <RBRACE>
+    {
+        Location obstacleLocation = locList.get(0);
+        List<Location> obstacleLocations = new ArrayList<>();
+        obstacleLocations.add(obstacleLocation);
+        Obstacle obstacle = new Obstacle(obstacleLocations, requiredItems);
+        obstacles.add(obstacle);
+        game.addObstacle(obstacle);
+    }
+}
+
+// plugin declaration
+void PluginDeclarations() : 
+{
+    Token pluginName;
+} 
+{
+    <PLUGIN> QualifiedName() 
+    {
+        //System.out.println("Parsed Plugin:");
+        //System.out.println(plugins);
+    }
+}
+
+// used in plugin declaration
+void QualifiedName() : 
+{
+    Token part;
+    StringBuilder qualifiedName = new StringBuilder();
+} 
+{
+    part = <IDENTIFIER> 
+    {
+        qualifiedName.append(part.image);
+    }
+    ( <DOT> part = <IDENTIFIER> 
+    {
+        qualifiedName.append("." + part.image);
+    })*
+    {
+        plugins.add("Plugin: " + qualifiedName.toString());
+    }
+}
+
+void ScriptDeclarations() : 
+{
+    Token codeBlock;
+} 
+{
+    <SCRIPT> codeBlock = <CODE> 
+    {
+        // Store the parsed script content
+        String scriptContent = codeBlock.image.substring(2, codeBlock.image.length() - 1);
+        System.out.println("Parsed script: " + scriptContent); // Debug output
+        scripts.add(scriptContent);
+
+        // Add script to game
+        Script script = new Script(scriptContent);
+        game.addScript(script);
+    }
+}
+
+// single coordinate pair
+void Coordinate(List<Location> locList) : 
+{
+    Token x; 
+    Token y;
+} 
+{
+    <LPAREN> x = <NUMBER> <COMMA> y = <NUMBER> <RPAREN>
+    {
+        locList.add(new Location(Integer.parseInt(x.image), Integer.parseInt(y.image)));
+    }
+}
+
+// at declaration (proceeds list of locations)
+void AtDeclaration(List<Location> locList) : 
+{
+} 
+{
+    <AT> CoordinateList(locList)
+}
+
+// list of coordinate pairs 
+void CoordinateList(List<Location> locList) : 
+{
+} 
+{
+    Coordinate(locList) ( <COMMA> Coordinate(locList) )*
+}
+
+// message declaration
+void MessageDeclaration() : 
+{
+    Token msgToken;
+} 
+{
+    <MESSAGE> msgToken = <STRING_LITERAL>
+    {
+        message = msgToken.image.substring(1, msgToken.image.length() - 1); 
+    }
+}
+
+// requires declaration (for required items) - used by obstacle declaration
+void RequiresDeclaration(List<Item> requiredItems) : 
+{ 
+    Token itemToken; 
+    List<String> tempItems = new ArrayList<>();
+} 
+{ 
+    <REQUIRES> itemToken = <STRING_LITERAL> ( <COMMA> itemToken = <STRING_LITERAL> )* 
+    {
+        tempItems.add(itemToken.image);
+        
+        for (String item : tempItems)
+        {
+            String itemName = item.substring(1, item.length() - 1); // 1, -1 to remove the "" quotes
+            requiredItems.add(new Item(itemName, new ArrayList<Location>(), "n/a")); // message does not matter here, only the item name for comparison purposes
+        }
+    }
+}
