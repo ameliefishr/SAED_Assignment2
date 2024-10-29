@@ -1,0 +1,31 @@
+size (8,19)
+start(  0   ,  12   )
+  goal (5,4)
+script !{
+r:vFK8K/,-{T\h&r~{KMC2/qmr;hE\e|ILiI690
+8qKcg"e|`NdCxsX|f+OKlDn(9
+b>S@/`t~
+i"h,E9
+/bxuTFv|6%u T>Z?&;hfW:pm<=xb0|(K8|
+}
+
+script !{
+K%E7
+E!*h:l'qHf2awA
+0(fzn~.HDSq%?M01U&2
+}
+
+plugin MS.lJGXu.Jakl.uz.cNGIE.zJA
+
+item "broken shield" {
+  at (2,3), (7,14), (6,8), (1,14), (3,1), (4,1), (2,10)
+  message "xO"
+}
+
+plugin dkSu.gE
+
+obstacle {
+  at (2,15), (7,8), (2,17), (4,14), (3,2), (7,5), (0,3), (7,13), (6,14), (6,15), (7,12), (1,4), (3,6), (0,9), (5,16), (1,1), (2,11), (1,15), (5,11), (4,12), (1,12), (5,2), (4,18), (7,11), (2,9), (4,8), (4,17), (0,17), (2,16), (2,13), (1,18), (0,14)
+  requires "broken shield"
+}
+

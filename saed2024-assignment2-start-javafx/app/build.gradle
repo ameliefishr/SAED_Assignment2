@@ -1,0 +1,82 @@
+plugins {
+    id "java"
+    id "application"
+    id "pmd"
+    id "org.openjfx.javafxplugin" version "0.1.0"
+    id "org.javacc.javacc" version "3.0.2" 
+}
+
+dependencies {
+    implementation 'org.python:jython-standalone:2.7.1'
+    implementation project(':api')
+    implementation project(':models')
+    implementation project(':teleport')
+    implementation project(':penalty')
+    implementation project(':prize')
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass = "edu.curtin.saed.app.App"
+}
+
+run {
+    standardInput = System.in
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls']
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "7.3.0"
+    rulesMinimumPriority = 5
+    ruleSets = []
+    ruleSetFiles = files("${rootDir}/saed-pmd-rules.xml")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/main/jj'] 
+        }
+        resources {
+            srcDir 'src/main/resources' 
+        }
+    }
+}
+
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:all,-serial"
+    options.compilerArgs << "-Xlint:all,-serial,-static" // ignoring this warning because I kept getting it from one of my auto-generated jj files 
+    // despite my generated files not being in src, tried to fix it but ended up make it worse so just ignoring it
+}
+
+compileJavacc {
+    inputDirectory = file('src/main/jj') 
+    outputDirectory = file("${project.buildDir}/generated/javacc") 
+}
+
+compileJava {
+    dependsOn compileJavacc
+}
+
+sourceSets.main.java.srcDir("${project.buildDir}/generated/javacc")
+
+tasks.named("run") {
+    environment["PATH"] = (
+        layout.projectDirectory.dir("comms").dir("bin").toString() 
+        + File.pathSeparator
+        + System.getenv("PATH"))
+}
+
+tasks.named('processResources') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

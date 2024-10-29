@@ -1,0 +1,38 @@
+size (10,10)
+start (1,5)
+goal (9,8)
+
+item "Wooden Sword" {
+    at (0,0), (10,5), (7,1)
+    message "Use wisely."
+}
+
+item "Rock" {
+    at (1,3), (2,7), (9,8), (5, 5), (1,2)
+    message "A cool rock."
+}
+
+item "map" {
+    at (2,4)
+    message "Suddenly you can see."
+}
+
+obstacle {
+    at (1,1)
+    requires "Wooden Sword"
+}
+
+plugin org.example.myplugins.PluginX
+
+script !{
+class Reveal:
+    def __init__(self, api):
+        self.api = api
+        print("Reveal script running")
+
+    def onItemPickedUp(self, item):
+        if "map" in item.lower():
+            self.api.toggleReveal(True)
+
+reveal = Reveal(api)
+}
